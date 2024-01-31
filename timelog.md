@@ -1,3 +1,5 @@
 | Date       |  Adrian  | Dharini  |  Ernest  | Gayathri |  Harry   |  Kelly   | Task                         |
-| 2024/01/08 | -------- | -------- | -------- | -------- | -------- | -------- | ---------------------------- |
-| 2024/01/09 | -------- | -------- | -------- | -------- | -------- | -------- | ---------------------------- |
+| 2024/01/16 | -------- | 4 | -------- | -------- | -------- | -------- | brainstorm project topics, initial research to see if it is feasible, narrow down to 3 ideas |
+| 2024/01/17 | -------- | 4 | -------- | -------- | -------- | -------- | decided on project topic and project discussion |
+| 2024/01/23 | -------- | 6 | -------- | -------- | -------- | -------- | work on proposal presentation |
+| 2024/01/30 | -------- | 6 | -------- | -------- | -------- | -------- | work on project proposal |
