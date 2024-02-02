@@ -1,4 +1,4 @@
-# [Project Title - TBD]
+# City Spots
 ECE 452 - Software Design and Architecture Group Project
 
 ## Group 22 Members:
