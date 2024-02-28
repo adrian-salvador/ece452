@@ -6,9 +6,10 @@ import com.example.cityspots.model.Entry
 import com.example.cityspots.model.GeoLocation
 import com.example.cityspots.model.User
 
-class UserViewModel(private val userId: String) : ViewModel() {
+class UserViewModel() : ViewModel() {
 
     private val userLiveData = MutableLiveData<User?>()
+    private val userId = "test"
 
     init {
         fetchUserData("user1") // Assuming a default or logged-in user ID for simplicity
