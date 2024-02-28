@@ -13,6 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CitySpots"
+rootProject.name = "CityHangouts"
 include(":app")
- 
