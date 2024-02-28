@@ -8,7 +8,7 @@ import com.example.cityspots.model.User
 
 class UserViewModel() : ViewModel() {
 
-    private val userLiveData = MutableLiveData<User?>()
+    val userLiveData = MutableLiveData<User?>()
     private val userId = "test"
 
     init {
