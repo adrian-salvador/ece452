@@ -4,3 +4,4 @@
 | 2024/01/17 | 4      | 4       | 4      |     4    |     4 | 4     | decided on project topic and project discussion                                              |
 | 2024/01/23 | 6      | 6       | 6      |      6   |      6| 6     | work on proposal presentation                                                                |
 | 2024/01/30 | 6      | 6       | 6      |     6    |   6   | 6     | work on project proposal                                                                     |
+| 2024/02/28 |        |         | 6      |          |       |       | setup MVVM file structure                                                                    |

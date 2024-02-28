@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.cityhangouts"
+    namespace = "com.example.cityspots"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.cityhangouts"
+        applicationId = "com.example.cityspots"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
