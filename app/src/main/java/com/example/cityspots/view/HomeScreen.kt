@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,7 +36,7 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel = view
     var selectedCity by remember { mutableStateOf(cities[0]) }
 
     // Observe userLiveData from UserViewModel
-   // val user by userViewModel.userLiveData.observeAsState()
+    val user by userViewModel.userLiveData.observeAsState()
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
