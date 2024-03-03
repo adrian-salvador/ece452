@@ -136,7 +136,6 @@ fun EntryScreen(navController: NavController, currentEntry : Entry) {
 
                     Box(
                         Modifier
-//                            .clip(RoundedCornerShape(10))
                             .background(Color.White)
                             .padding(20.dp)
                     ) {
