@@ -10,6 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 
 @Composable
@@ -22,7 +23,9 @@ fun BottomNavigationBar(navController: NavController) {
         "userProfile" to Icons.Default.Person
     )
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = Color.White
+    ) {
         val currentRoute = navController.currentDestination?.route
         items.forEach { (route, icon) ->
             NavigationBarItem(
