@@ -1,6 +1,5 @@
 package com.example.cityspots.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -8,8 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,7 +38,8 @@ import com.example.cityspots.model.Entry
 fun EntryScreen(navController: NavController, currentEntry : Entry) {
 
     Scaffold (
-        bottomBar = { BottomNavigationBar(navController = navController) }
+        bottomBar = { BottomNavigationBar(navController = navController) },
+        containerColor = Color(0x2F84ABE4)
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             Column (
@@ -78,42 +80,45 @@ fun EntryScreen(navController: NavController, currentEntry : Entry) {
 
                 Row {
                     Box {
-                        Text(
-                            modifier = Modifier.padding(start = 20.dp),
-                            style = MaterialTheme.typography.titleLarge,
-                            text = currentEntry.content
-                        )
+                        Column {
+                            Text(
+                                modifier = Modifier.padding(start = 20.dp),
+                                style = MaterialTheme.typography.titleLarge,
+                                text = currentEntry.content,
+                                color = Color.Black,
+                            )
+                            Text(
+                                text = "${currentEntry.geoLocation.longitude}°, " +
+                                        "${currentEntry.geoLocation.latitude}°",
+                                modifier = Modifier.padding(start = 20.dp),
+                                color = Color.Gray,
+                            )
+                        }
                     }
 
                     Spacer(Modifier.weight(1f))
 
-                    Box(
-                        Modifier
-                            .size(55.dp)
-                            .clip(CircleShape)
-                            .background(Color.Blue)
-                            .padding(12.dp)
-                            .aspectRatio(1f)
+                    Card(
+                        shape = CircleShape,
+                        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+                        modifier = Modifier.size(50.dp)
                     ) {
-                        Text(
-                            text = "#${currentEntry.ranking}",
-                            color = Color.White,
+                        Box(
+                            contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .align(Alignment.Center)
-                        )
+                                .fillMaxSize()
+                        ) {
+                            Text(
+                                text = "#${currentEntry.ranking}",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier
+                                    .background(Color.White, CircleShape)
+                                    .padding(9.dp)
+                            )
+                        }
                     }
-                    Spacer(Modifier.padding(end = 20.dp))
-                }
 
-                Row {
-                    Box(
-                        Modifier.padding(start = 20.dp)
-                    ) {
-                        Text(
-                            text = "${currentEntry.geoLocation.longitude}°, " +
-                                    "${currentEntry.geoLocation.latitude}°"
-                        )
-                    }
+                    Spacer(Modifier.padding(end = 20.dp))
                 }
 
                 Spacer(modifier = Modifier.height(30.dp))
@@ -131,8 +136,8 @@ fun EntryScreen(navController: NavController, currentEntry : Entry) {
 
                     Box(
                         Modifier
-                            .clip(RoundedCornerShape(10))
-                            .background(Color.LightGray)
+//                            .clip(RoundedCornerShape(10))
+                            .background(Color.White)
                             .padding(20.dp)
                     ) {
                         Text(text = currentEntry.review)
@@ -160,12 +165,13 @@ fun EntryScreen(navController: NavController, currentEntry : Entry) {
                     for (tag in currentEntry.tags) {
                         Box(
                             Modifier
-                                .clip(RoundedCornerShape(10))
-                                .background(Color.LightGray)
-                                .padding(14.dp)
+                                .clip(RoundedCornerShape(40.dp))
+                                .background(Color.White)
+                                .padding(15.dp)
                         ) {
                             Text(
-                                text = tag
+                                text = tag,
+                                color = Color(0xFF176FF2),
                             )
                         }
                         Spacer(Modifier.padding(end = 15.dp))
