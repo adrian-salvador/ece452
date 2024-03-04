@@ -1,5 +1,6 @@
 package com.example.cityspots.view
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -7,8 +8,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,156 +25,160 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
 import com.example.cityspots.model.Entry
+import com.example.cityspots.viewmodel.UserViewModel
 
 @Composable
-
-fun EntryScreen(navController: NavController, currentEntry : Entry) {
+fun EntryScreen(navController: NavController, userViewModel: UserViewModel = viewModel()) {
+    val user by userViewModel.userLiveData.observeAsState()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val entryId = navBackStackEntry?.arguments?.getInt("entryId") ?: 1
+    val currentEntry = user?.entries?.get(entryId)
 
     Scaffold (
-        bottomBar = { BottomNavigationBar(navController = navController) },
-        containerColor = Color(0x2F84ABE4)
+        bottomBar = { BottomNavigationBar(navController = navController) }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            Column (
-                Modifier
-                    .fillMaxHeight()
-                    .verticalScroll(rememberScrollState())
-            ) {
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Row (
+        if (currentEntry != null) {
+            Box(modifier = Modifier.padding(innerPadding)) {
+                Column(
                     Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                    ,
-                    horizontalArrangement = Arrangement.Center
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    for (image in currentEntry.pictures) {
-                        Box(
-                            modifier = Modifier
-                                // change height and width to be dynamic in the future?
-                                .height(250.dp)
-                                .width(368.dp)
-                                .padding(end = 8.dp)
-                        ) {
-                            AsyncImage(
-                                modifier = Modifier.clip(RoundedCornerShape(5)),
-                                model = image,
-                                contentDescription = "image"
-                            )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Row(
+                        Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        for (image in currentEntry.pictures) {
+                            Box(
+                                modifier = Modifier
+                                    // change height and width to be dynamic in the future?
+                                    .height(250.dp)
+                                    .width(368.dp)
+                                    .padding(end = 8.dp)
+                            ) {
+                                AsyncImage(
+                                    modifier = Modifier.clip(RoundedCornerShape(5)),
+                                    model = image,
+                                    contentDescription = "image"
+                                )
+                            }
+
                         }
-
                     }
-                }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
 
-                Row {
-                    Box {
-                        Column {
+                    Row {
+                        Box {
                             Text(
                                 modifier = Modifier.padding(start = 20.dp),
                                 style = MaterialTheme.typography.titleLarge,
-                                text = currentEntry.content,
-                                color = Color.Black,
-                            )
-                            Text(
-                                text = "${currentEntry.geoLocation.longitude}°, " +
-                                        "${currentEntry.geoLocation.latitude}°",
-                                modifier = Modifier.padding(start = 20.dp),
-                                color = Color.Gray,
+                                text = currentEntry.content
                             )
                         }
-                    }
 
-                    Spacer(Modifier.weight(1f))
+                        Spacer(Modifier.weight(1f))
 
-                    Card(
-                        shape = CircleShape,
-                        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-                        modifier = Modifier.size(50.dp)
-                    ) {
                         Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .fillMaxSize()
+                            Modifier
+                                .size(55.dp)
+                                .clip(CircleShape)
+                                .background(Color.Blue)
+                                .padding(12.dp)
+                                .aspectRatio(1f)
                         ) {
                             Text(
                                 text = "#${currentEntry.ranking}",
-                                style = MaterialTheme.typography.titleMedium,
+                                color = Color.White,
                                 modifier = Modifier
-                                    .background(Color.White, CircleShape)
-                                    .padding(9.dp)
+                                    .align(Alignment.Center)
                             )
                         }
+                        Spacer(Modifier.padding(end = 20.dp))
                     }
 
-                    Spacer(Modifier.padding(end = 20.dp))
-                }
-
-                Spacer(modifier = Modifier.height(30.dp))
-
-                Text(
-                    modifier = Modifier.padding(start = 20.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                    text = "Reviews"
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Row {
-                    Spacer(modifier = Modifier.padding(start = 20.dp))
-
-                    Box(
-                        Modifier
-                            .background(Color.White)
-                            .padding(20.dp)
-                    ) {
-                        Text(text = currentEntry.review)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(30.dp))
-
-                Text(
-                    modifier = Modifier.padding(start = 20.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                    text = "Tags"
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Row (
-                    Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                    ,
-                    horizontalArrangement = Arrangement.Center
-                ){
-                    for (tag in currentEntry.tags) {
+                    Row {
                         Box(
-                            Modifier
-                                .clip(RoundedCornerShape(40.dp))
-                                .background(Color.White)
-                                .padding(15.dp)
+                            Modifier.padding(start = 20.dp)
                         ) {
                             Text(
-                                text = tag,
-                                color = Color(0xFF176FF2),
+                                text = "${currentEntry.geoLocation.longitude}°, " +
+                                        "${currentEntry.geoLocation.latitude}°"
                             )
                         }
-                        Spacer(Modifier.padding(end = 15.dp))
+                    }
+
+                    Spacer(modifier = Modifier.height(30.dp))
+
+                    Text(
+                        modifier = Modifier.padding(start = 20.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        text = "Reviews"
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row {
+                        Spacer(modifier = Modifier.padding(start = 20.dp))
+
+                        Box(
+                            Modifier
+                                .clip(RoundedCornerShape(10))
+                                .background(Color.LightGray)
+                                .padding(20.dp)
+                        ) {
+                            Text(text = currentEntry.review)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(30.dp))
+
+                    Text(
+                        modifier = Modifier.padding(start = 20.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        text = "Tags"
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(
+                        Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        for (tag in currentEntry.tags) {
+                            Box(
+                                Modifier
+                                    .clip(RoundedCornerShape(10))
+                                    .background(Color.LightGray)
+                                    .padding(14.dp)
+                            ) {
+                                Text(
+                                    text = tag
+                                )
+                            }
+                            Spacer(Modifier.padding(end = 15.dp))
+                        }
                     }
                 }
             }
