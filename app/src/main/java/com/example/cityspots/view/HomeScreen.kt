@@ -27,16 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.cityspots.model.User
 import com.example.cityspots.viewmodel.UserViewModel
 
 @Composable
-fun HomeScreen(navController: NavController, userViewModel: UserViewModel = viewModel()) {
+fun HomeScreen(navController: NavController, userViewModel: UserViewModel) {
     val cities = listOf("Waterloo", "Kitchener", "Toronto", "Cambridge", "Mississauga")
     var expanded by remember { mutableStateOf(false) }
     var selectedCity by remember { mutableStateOf(cities[0]) }
-
-    // Observe userLiveData from UserViewModel
-    val user by userViewModel.userLiveData.observeAsState()
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }

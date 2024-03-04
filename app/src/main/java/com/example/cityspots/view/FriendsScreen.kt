@@ -14,10 +14,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.cityspots.model.Friend
+import com.example.cityspots.model.User
 import com.example.cityspots.viewmodel.UserViewModel
 
 @Composable
-fun FriendsScreen(navController: NavController, userViewModel: UserViewModel = viewModel()) {
+fun FriendsScreen(navController: NavController, userViewModel: UserViewModel) {
     val friends = mutableListOf<Friend>().apply {
         addAll(userViewModel.getFriends() ?: emptyList())
     }
