@@ -3,33 +3,37 @@ package com.example.cityspots.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.cityspots.model.Entry
+import com.example.cityspots.model.Friend
 import com.example.cityspots.model.GeoLocation
 import com.example.cityspots.model.User
 
 class UserViewModel() : ViewModel() {
 
     val userLiveData = MutableLiveData<User?>()
-    private val userId = "test"
+    val userId = MutableLiveData<Int>(0)
 
     init {
-        fetchUserData("user1") // Assuming a default or logged-in user ID for simplicity
+        fetchUserData(0) // Assuming a default or logged-in user ID for simplicity
     }
 
-    fun loginUser(userId: String) {
+    fun loginUser(userId: Int) {
+        this.userId.value = userId
         // Simulate fetching user data for the logged-in user
         fetchUserData(userId)
     }
 
-    private fun fetchUserData(userId: String) {
+    private fun fetchUserData(userId: Int) {
         // Mocking user data with initial entries
         val mockUser = User(
             id = userId,
             name = "Alice",
             entries = mutableListOf(
                 // Your initial mock entries
-            )
+            ),
+            friends = mutableListOf()
         )
         fetchUserEntries(mockUser) // Fetch entries and add them to the mockUser
+        fetchUserFriends(mockUser)
         userLiveData.postValue(mockUser)
     }
     private fun fetchUserEntries(user: User) {
@@ -86,6 +90,28 @@ class UserViewModel() : ViewModel() {
         user.entries.addAll(mockEntries)
     }
 
+    private fun fetchUserFriends(user: User) {
+        // Mocking entries data and adding them to the user's entries list
+        val mockFriends = mutableListOf(
+            Friend(
+                id = 1,
+                name = "Jennifer",
+                username = "jennifer123"
+            ),
+            Friend(
+                id = 2,
+                name = "Timothy",
+                username = "tim"
+            ),
+            Friend(
+                id = 3,
+                name = "Jonathan",
+                username = "jon"
+            )
+        )
+        user.friends.addAll(mockFriends)
+    }
+
     fun addEntry(entry: Entry) {
         val currentUser = userLiveData.value
         currentUser?.entries?.add(entry)
@@ -100,4 +126,9 @@ class UserViewModel() : ViewModel() {
             userLiveData.postValue(currentUser) // Update LiveData to notify observers
         }
     }
+
+    fun getFriends(): MutableList<Friend>? {
+        return userLiveData.value?.friends
+    }
+
 }
