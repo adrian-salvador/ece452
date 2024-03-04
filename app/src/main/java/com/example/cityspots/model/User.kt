@@ -1,7 +1,8 @@
 package com.example.cityspots.model
 
 data class User(
-    val id: String,
+    val id: Int,
     val name: String,
-    var entries: MutableList<Entry>
+    var entries: MutableList<Entry>,
+    var friends: MutableList<Friend>
 )
