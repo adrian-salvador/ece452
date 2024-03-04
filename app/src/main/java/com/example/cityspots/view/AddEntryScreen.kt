@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsEndWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -90,10 +92,12 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    LocationNameEntry(entryName, hasTitle) { name, hasName ->
+                    LocationNameEntry(entryName, hasTitle, Modifier.weight(3F)) { name, hasName ->
                         entryName = name
                         hasTitle = hasName
                     }
+
+                    Spacer(modifier = Modifier.weight(1f))
 
                     RankingDropdown(
                         addEntryViewModel,
@@ -103,7 +107,8 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                         hasTitle,
                         entryName,
                         description,
-                        tags
+                        tags,
+                        Modifier.weight(1F)
                     )
                 }
 
@@ -137,11 +142,11 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
 }
 
 @Composable
-fun LocationNameEntry(entryName: String, hasTitle: Boolean, onValueChange: (String, Boolean) -> Unit) {
-    Box {
+fun LocationNameEntry(entryName: String, hasTitle: Boolean, modifier: Modifier, onValueChange: (String, Boolean) -> Unit) {
+    Box (modifier = modifier){
         if (!hasTitle) {
             Text(
-                text = "Location Name",
+                text = "Activity Name",
                 color = Color.Gray,
                 style = MaterialTheme.typography.titleLarge
             )
@@ -166,11 +171,12 @@ fun RankingDropdown(
     hasTitle: Boolean,
     entryName: String,
     description: String,
-    tags: MutableList<String>
+    tags: MutableList<String>,
+    modifier: Modifier
 ) {
     var rankingExpanded by remember { mutableStateOf(false) }
 
-    Box {
+    Box (modifier = modifier){
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.clickable { rankingExpanded = !rankingExpanded }
@@ -320,7 +326,7 @@ fun DisplayLocation() {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Waterloo",
+                    text = "New York City",
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
             }
