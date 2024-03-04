@@ -11,10 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.cityspots.model.User
+import com.example.cityspots.viewmodel.UserViewModel
 import kotlin.random.Random
 
 @Composable
-fun LoginScreen(navController: NavController, onLoginSuccess: (Int) -> Unit) {
+fun LoginScreen(navController: NavController, userViewModel: UserViewModel) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -39,9 +41,9 @@ fun LoginScreen(navController: NavController, onLoginSuccess: (Int) -> Unit) {
         Button(onClick = {
             // Simulate login logic
             // In a real app, you would authenticate against your backend and fetch user data
-            if (username.isNotEmpty() && password.isNotEmpty()) {
+            if (true || username.isNotEmpty() && password.isNotEmpty()) {
                 val userId = (Random.nextInt(1, 11))
-                onLoginSuccess(userId) // Pass the logged-in user's ID or username
+                userViewModel.loginUser(userId) // Pass the logged-in user's ID or username
                 navController.navigate("home") // Navigate to the home screen upon successful login
             }
         }) {

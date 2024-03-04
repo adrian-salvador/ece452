@@ -18,12 +18,11 @@ import com.example.cityspots.viewmodel.UserViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val userViewModel: UserViewModel by viewModels()
         setContent {
             CityHangoutsTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    AppNavigator(userViewModel)
+                    AppNavigator()
                 }
             }
         }
