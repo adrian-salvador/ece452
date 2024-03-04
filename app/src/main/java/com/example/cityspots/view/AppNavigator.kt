@@ -17,6 +17,7 @@ fun AppNavigator(userViewModel: UserViewModel) {
 //        }
         composable("home") { HomeScreen(navController, userViewModel) }
         composable("ranking") { RankingScreen(navController, userViewModel) }
+        composable("entry/{entryId}") { EntryScreen(navController, userViewModel) }
         composable("addEntry") { AddEntryScreen(navController, userViewModel) }
     }
 }
