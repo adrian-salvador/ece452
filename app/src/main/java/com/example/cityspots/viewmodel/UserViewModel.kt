@@ -35,10 +35,11 @@ class UserViewModel() : ViewModel() {
     private fun fetchUserEntries(user: User) {
         // Mocking entries data and adding them to the user's entries list
         val mockEntries = mutableListOf(
+            // Images used are copyright free
             Entry(
                 id = 1,
                 content = "Central Park Visit",
-                pictures = listOf("https://example.com/pic1.jpg", "https://example.com/pic2.jpg"),
+                pictures = listOf("https://images.pexels.com/photos/327502/pexels-photo-327502.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"),
                 ranking = 5,
                 review = "A peaceful escape from the city buzz. Loved the greenery and lakes!",
                 tags = listOf("park", "nature", "family-friendly"),
@@ -47,7 +48,7 @@ class UserViewModel() : ViewModel() {
             Entry(
                 id = 2,
                 content = "Golden Gate Bridge Sightseeing",
-                pictures = listOf("https://example.com/pic3.jpg", "https://example.com/pic4.jpg"),
+                pictures = listOf("https://images.pexels.com/photos/208745/pexels-photo-208745.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"),
                 ranking = 4,
                 review = "Iconic structure with breathtaking views, but quite windy.",
                 tags = listOf("bridge", "landmark", "scenic"),
@@ -56,8 +57,8 @@ class UserViewModel() : ViewModel() {
             Entry(
                 id = 3,
                 content = "Louvre Museum Tour",
-                pictures = listOf("https://example.com/pic5.jpg", "https://example.com/pic6.jpg"),
-                ranking = 5,
+                pictures = listOf("https://images.pexels.com/photos/2363/france-landmark-lights-night.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"),
+                ranking = 1,
                 review = "The art collection is impressive. The Mona Lisa is a must-see!",
                 tags = listOf("museum", "art", "culture"),
                 geoLocation = GeoLocation(48.8606, 2.3376) // Louvre Museum, Paris
@@ -65,8 +66,8 @@ class UserViewModel() : ViewModel() {
             Entry(
                 id = 4,
                 content = "Mount Fuji Hike",
-                pictures = listOf("https://example.com/pic7.jpg", "https://example.com/pic8.jpg"),
-                ranking = 5,
+                pictures = listOf("https://images.pexels.com/photos/3408353/pexels-photo-3408353.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"),
+                ranking = 2,
                 review = "Challenging hike but the view from the top is worth every step.",
                 tags = listOf("mountain", "hiking", "nature"),
                 geoLocation = GeoLocation(35.3606, 138.7274) // Mount Fuji, Japan
@@ -74,8 +75,8 @@ class UserViewModel() : ViewModel() {
             Entry(
                 id = 5,
                 content = "Venice Canal Tour",
-                pictures = listOf("https://example.com/pic9.jpg", "https://example.com/pic10.jpg"),
-                ranking = 4,
+                pictures = listOf("https://images.pexels.com/photos/15857929/pexels-photo-15857929/free-photo-of-bridge-over-canal-in-venice.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"),
+                ranking = 3,
                 review = "Unique city with stunning architecture and history. The gondola ride was magical.",
                 tags = listOf("canals", "boating", "historic"),
                 geoLocation = GeoLocation(45.4408, 12.3155) // Venice, Italy
