@@ -12,13 +12,12 @@ fun AppNavigator(userViewModel: UserViewModel) {
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
             LoginScreen(navController) { userId ->
-                userViewModel.loginUser(userId) // Update the logged-in user in ViewModel
+                userViewModel.loginUser(userId)
             }
         }
         composable("home") { HomeScreen(navController, userViewModel) }
         composable("ranking") { RankingScreen(navController, userViewModel) }
-        composable("addEntry") { AddEntryScreen(navController) }
+        composable("addEntry") { AddEntryScreen(navController, userViewModel) }
         composable("friends") { FriendsScreen(navController, userViewModel) }
-
     }
 }
