@@ -275,14 +275,6 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
             }
         }
     }
-//    Spacer(modifier = Modifier.height(8.dp))
-//    Button(onClick = {
-//        // val newEntry = Entry(id = (user.entries.maxOfOrNull { it.id } ?: 0) + 1, content = text)
-//        // user.entries.add(newEntry)
-//        navController.popBackStack()
-//    }) {
-//        Text("Add")
-//    }
 }
 
 @Composable
