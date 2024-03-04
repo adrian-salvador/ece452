@@ -43,7 +43,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
     val entryId = navBackStackEntry.arguments!!.getInt("entryId")
     println(entryId)
     val currentEntry = user!!.rankings.get(entryId)
-    val currentEntryRank = user!!.rankings.getRankById(entryId)
+    val currentEntryRank = user!!.rankings.getRankById(entryId)?.plus(1)
 
     Scaffold (
         bottomBar = { BottomNavigationBar(navController = navController) }

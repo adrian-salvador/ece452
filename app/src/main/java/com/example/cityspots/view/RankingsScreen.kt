@@ -32,7 +32,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.cityspots.model.User
 import com.example.cityspots.viewmodel.UserViewModel
 
 @Composable
