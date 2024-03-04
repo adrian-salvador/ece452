@@ -9,12 +9,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -22,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -80,7 +83,6 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
     )
 
     val newEntryId = addEntryViewModel.newEntryId
-    println("newEntryId: ${newEntryId}")
     val clonedRankings by addEntryViewModel.clonedRankings.observeAsState()
     val newEntryRanking by addEntryViewModel.newEntryRanking.observeAsState()
 
@@ -120,7 +122,7 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                     )
                 }
 
-                RatingBar(rating = (newEntryRanking!!.toFloat()/clonedRankings!!.length()))
+                DisplayLocation()
 
                 DescriptionEntry(description) { newDescription ->
                     description = newDescription
@@ -199,7 +201,7 @@ fun RankingDropdown(
                         .fillMaxSize()
                 ) {
                     Text(
-                        text = "#${newEntryRank!! + 1}",
+                        text = "%.2f".format((1-(newEntryRank!!).toFloat() / (clonedRankings!!.length()-1)) * 5),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier
                             .background(Color.White, CircleShape)
@@ -217,7 +219,7 @@ fun RankingDropdown(
             onDismissRequest = { rankingExpanded = false }) {
             clonedRankings?.toList()?.forEachIndexed { index, entry ->
                 DropdownMenuItem(
-                    text = { Text("#${index + 1}: ${entry.title} ${entry.id}") },
+                    text = { Text("#${index + 1}: ${entry.title}") },
                     onClick = {
                         rankingExpanded = false
                         addEntryViewModel.insertEntryInClone(index, Entry(
@@ -311,6 +313,36 @@ fun TagEntry(tags: MutableList<String>) {
         }
     }
 }
+
+@Composable
+fun DisplayLocation() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = Color(0xFFDBE8F9),
+            contentColor = Color(0xFF176FF2)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "Location",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Waterloo",
+                    style = TextStyle(fontWeight = FontWeight.Bold)
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun DisplayTags(tags: List<String>) {
