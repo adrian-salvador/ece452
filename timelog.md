@@ -13,4 +13,4 @@
 | 2024/03/03 |        |         |        |          |       | 6     | worked on the login page and friends page                                                                 |
 | 2024/03/03 |        |         |        | 2        |       |       | worked on ranking page                                                                                    |
 | 2024/02/03 |        |         | 2      |          |       |       | rework models to include rankings list data structure and refactor views and view models to be compatible |
-| 2024/02/03 |        |         | 5      |          |       |       | change add entry view to use live data in rankings dropdown and to insert entry in ranking data structure |
+| 2024/02/04 |        |         | 5      |          |       |       | change add entry view to use live data in rankings dropdown and to insert entry in ranking data structure |
