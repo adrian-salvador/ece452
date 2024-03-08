@@ -15,3 +15,4 @@
 | 2024/02/03 |        |         | 2      |          |       |       | rework models to include rankings list data structure and refactor views and view models to be compatible |
 | 2024/02/04 |        |         | 5      |          |       |       | change add entry view to use live data in rankings dropdown and to insert entry in ranking data structure |
 | 2024/02/04 |        |         | 1      |          |       |       | create first prototype demo slides                                                                        |
+| 2024/03/08 |        |         |        |          |       | 4     | worked on the prototype demo document                                                                 |
