@@ -1,4 +1,4 @@
-package com.example.cityspots
+package com.group22.cityspots
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

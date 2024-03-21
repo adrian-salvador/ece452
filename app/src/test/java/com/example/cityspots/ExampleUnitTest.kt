@@ -1,4 +1,4 @@
-package com.example.cityspots
+package com.group22.cityspots
 
 import org.junit.Test
 

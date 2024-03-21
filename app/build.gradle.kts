@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.cityspots"
+    namespace = "com.group22.cityspots"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.cityspots"
+        applicationId = "com.group22.cityspots"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
