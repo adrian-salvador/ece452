@@ -1,6 +1,5 @@
 package com.example.cityspots.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -19,8 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,18 +30,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
-import com.example.cityspots.model.Entry
+import com.example.cityspots.model.User
 import com.example.cityspots.viewmodel.UserViewModel
 
 @Composable
-fun EntryScreen(navController: NavController, userViewModel: UserViewModel = viewModel()) {
+fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEntry, userViewModel: UserViewModel) {
     val user by userViewModel.userLiveData.observeAsState()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val entryId = navBackStackEntry?.arguments?.getInt("entryId") ?: 1
-    val currentEntry = user?.entries?.get(entryId)
+    val entryId = navBackStackEntry.arguments!!.getInt("entryId")
+    println(entryId)
+    val currentEntry = user!!.rankings.get(entryId)
+    val currentEntryRank = user!!.rankings.getRankById(entryId)?.plus(1)
 
     Scaffold (
         bottomBar = { BottomNavigationBar(navController = navController) }
@@ -91,7 +90,7 @@ fun EntryScreen(navController: NavController, userViewModel: UserViewModel = vie
                             Text(
                                 modifier = Modifier.padding(start = 20.dp),
                                 style = MaterialTheme.typography.titleLarge,
-                                text = currentEntry.content
+                                text = currentEntry.title
                             )
                         }
 
@@ -106,7 +105,7 @@ fun EntryScreen(navController: NavController, userViewModel: UserViewModel = vie
                                 .aspectRatio(1f)
                         ) {
                             Text(
-                                text = "#${currentEntry.ranking}",
+                                text = "#${currentEntryRank}",
                                 color = Color.White,
                                 modifier = Modifier
                                     .align(Alignment.Center)
