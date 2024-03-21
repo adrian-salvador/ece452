@@ -1,4 +1,4 @@
-package com.group22.cityspots.presentation.sign_in
+package com.group22.cityspots.model
 
 data class SignInState(
     val isSignInSuccessful: Boolean = false,

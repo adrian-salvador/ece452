@@ -1,4 +1,4 @@
-package com.group22.cityspots.presentation.sign_in
+package com.group22.cityspots.model
 
 import android.content.Context
 import android.content.Intent
@@ -30,7 +30,7 @@ class GoogleAuthUIClient(
         }
         return result?.pendingIntent?.intentSender
     }
-    suspend fun signInWithIntent(intent: Intent): SignInResult{
+    suspend fun signInWithIntent(intent: Intent): SignInResult {
         val credential = oneTapClient.getSignInCredentialFromIntent(intent)
         val googleIdToken = credential.googleIdToken
         val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)

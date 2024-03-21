@@ -1,7 +1,7 @@
-package com.group22.cityspots.presentation.sign_in
+package com.group22.cityspots.model
 
 data class SignInResult(
-    val data: com.group22.cityspots.presentation.sign_in.UserData?,
+    val data: UserData?,
     val errorMessage: String?
 )
 

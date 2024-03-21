@@ -1,4 +1,4 @@
-package com.group22.cityspots.presentation.sign_in.profile
+package com.group22.cityspots.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.group22.cityspots.presentation.sign_in.UserData
+import com.group22.cityspots.model.UserData
 
 @Composable
 fun ProfileScreen(

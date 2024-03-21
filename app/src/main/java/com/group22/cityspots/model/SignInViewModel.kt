@@ -1,4 +1,4 @@
-package com.group22.cityspots.presentation.sign_in
+package com.group22.cityspots.model
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
