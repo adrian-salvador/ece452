@@ -17,3 +17,4 @@
 | 2024/02/04 |        |         | 1      |          |       |       | create first prototype demo slides                                                                        |
 | 2024/03/08 |        |         |        |          |       | 4     | worked on the prototype demo document                                                                     |
 | 2024/03/20 |        |         | 2      |          |       |       | finished example on deliverable 4                                                                         |
+| 2024/03/20 |        |         | 5      |          |       |       | get google auth working with firebase auth                                                                |
