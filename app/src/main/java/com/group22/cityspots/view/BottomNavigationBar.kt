@@ -1,6 +1,7 @@
 package com.group22.cityspots.view
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
@@ -17,7 +18,7 @@ import androidx.navigation.NavController
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
         "home" to Icons.Default.Home,
-        "ranking" to Icons.Default.List,
+        "ranking" to Icons.AutoMirrored.Filled.List,
         "addEntry" to Icons.Default.Add,
         "friends" to Icons.Default.Face,
         "userProfile" to Icons.Default.Person
