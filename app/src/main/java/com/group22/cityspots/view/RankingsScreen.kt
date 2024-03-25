@@ -29,13 +29,25 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.group22.cityspots.respository.Firestore
+import com.group22.cityspots.viewmodel.AddEntryViewModel
+import com.group22.cityspots.viewmodel.AddEntryViewModelFactory
+import com.group22.cityspots.viewmodel.RankingScreenViewModel
+import com.group22.cityspots.viewmodel.RankingScreenViewModelFactory
 import com.group22.cityspots.viewmodel.UserViewModel
 
 @Composable
 fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
     val user by userViewModel.userLiveData.observeAsState()
+    val rankingScreenViewModel: RankingScreenViewModel = viewModel(
+        factory = RankingScreenViewModelFactory(user!!.userId)
+    )
+    val entries by rankingScreenViewModel.entriesLiveData.observeAsState()
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { innerPadding ->
@@ -45,7 +57,7 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
             verticalArrangement = Arrangement.spacedBy((-60).dp),
             horizontalArrangement = Arrangement.spacedBy(5.dp),
         ) {
-            user!!.rankings.toList().forEachIndexed() { index, entry ->
+            entries?.forEachIndexed() { index, entry ->
                 item {
                     Column(
                         modifier = Modifier
@@ -55,10 +67,10 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                             .clip(RoundedCornerShape(5))
                             .shadow(elevation = 2.dp)
                             .clickable {
-                                navController.navigate("entry/${entry.id}")
+                                navController.navigate("entry/${entry.entryId}")
                             }
                     ) {
-                        if (entry.pictures.isNotEmpty()) {
+                        if (entry.pictures?.isNotEmpty() == true) {
                             Box(
                                 modifier = Modifier
                                     .height(190.dp)
@@ -86,8 +98,8 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                                 Icon(
                                     Icons.Filled.Add,
                                     contentDescription = "No image available",
-                                    modifier = Modifier.size(100.dp), // Adjust the size as needed
-                                    tint = Color.Gray // Optional: You can change the icon color
+                                    modifier = Modifier.size(100.dp),
+                                    tint = Color.Gray
                                 )
                             }
                         }
@@ -103,4 +115,3 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
         }
     }
 }
-

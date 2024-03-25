@@ -1,12 +1,6 @@
 package com.group22.cityspots.model
 
 data class SignInResult(
-    val data: UserData?,
+    val data: User?,
     val errorMessage: String?
-)
-
-data class UserData(
-    val userId: String,
-    val username: String?,
-    val profilePictureUrl: String?
 )

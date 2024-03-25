@@ -1,7 +1,13 @@
 package com.group22.cityspots.view
 
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,25 +20,17 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsEndWidth
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -46,7 +44,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -55,90 +56,153 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 import com.group22.cityspots.model.Entry
 import com.group22.cityspots.model.GeoLocation
-import com.group22.cityspots.model.RankingList
-import com.group22.cityspots.viewmodel.AddEntryScreenViewModel
-import com.group22.cityspots.viewmodel.AddEntryScreenViewModelFactory
+import com.group22.cityspots.viewmodel.AddEntryViewModel
+import com.group22.cityspots.viewmodel.AddEntryViewModelFactory
 import com.group22.cityspots.viewmodel.UserViewModel
 
 
 @Composable
 fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
-    val addEntryViewModel: AddEntryScreenViewModel = viewModel(
-        factory = AddEntryScreenViewModelFactory(userViewModel)
-    )
-
-    val newEntryId = addEntryViewModel.newEntryId
-    val clonedRankings by addEntryViewModel.clonedRankings.observeAsState()
-    val newEntryRanking by addEntryViewModel.newEntryRanking.observeAsState()
-
+    val user by userViewModel.userLiveData.observeAsState()
     var entryName by remember { mutableStateOf("") }
     var hasTitle by remember { mutableStateOf(false) }
     var description by remember { mutableStateOf("") }
     val tags = remember { mutableStateListOf("city", "nature") }
+    val addEntryViewModel: AddEntryViewModel = viewModel(
+        factory = AddEntryViewModelFactory(user!!.userId)
+    )
+    val rating by addEntryViewModel.ratingLiveData.observeAsState(initial = -1)
+    var showRatingPopup by remember { mutableStateOf(false) }
 
-    Scaffold(
-        bottomBar = { BottomNavigationBar(navController) },
-        containerColor = Color(0x2F84ABE4)
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(5.dp),
-                modifier = Modifier.padding(18.dp)
+    val imageUris = remember { mutableStateListOf<Uri>() }
+    val pickImagesLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            uri?.let { imageUris.add(it) }
+        }
+    )
+
+    val context = LocalContext.current
+
+
+    Box(modifier = Modifier.background(Color(0x2F84ABE4))
+        .padding(10.dp)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.padding(18.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    LocationNameEntry(entryName, hasTitle, Modifier.weight(3F)) { name, hasName ->
-                        entryName = name
-                        hasTitle = hasName
-                    }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    RankingDropdown(
-                        addEntryViewModel,
-                        newEntryRanking,
-                        newEntryId,
-                        clonedRankings,
-                        hasTitle,
-                        entryName,
-                        description,
-                        tags,
-                        Modifier.weight(1F)
-                    )
+                LocationNameEntry(entryName, hasTitle, Modifier.weight(3F)) { name, hasName ->
+                    entryName = name
+                    hasTitle = hasName
                 }
 
-                DisplayLocation()
+                Spacer(modifier = Modifier.weight(1f))
 
-                DescriptionEntry(description) { newDescription ->
-                    description = newDescription
+                Button(onClick = { showRatingPopup = true  }) {
+                    Text(String.format("%.2f", rating), style = MaterialTheme.typography.bodyLarge)
                 }
+            }
 
-                TagEntry(tags)
-                DisplayTags(tags)
+            DisplayLocation()
 
-                SubmitButton {
+            DescriptionEntry(description) { newDescription ->
+                description = newDescription
+            }
+
+            TagEntry(tags)
+            DisplayTags(tags)
+
+            // Display Selected Images
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .padding(top = 10.dp)
+            ) {
+                imageUris.forEach { uri ->
+                    CroppedSquareImage(uri)
+                }
+            }
+
+            //Upload Image Button
+            Button(
+                onClick = { pickImagesLauncher.launch("image/*") },
+                modifier = Modifier.padding(top = 10.dp)
+            ) {
+                Text("Upload Images")
+            }
+
+            //Submit Button
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 30.dp)
+            ) {
+                Button(onClick = {
                     if (hasTitle) {
-                        val newEntry = Entry(
-                            id = newEntryId,
+                        val entryDetails = Entry(
+                            entryId = null,
                             title = entryName,
-                            pictures = listOf(),
+                            pictures = null,
                             review = description,
                             tags = tags,
-                            geoLocation = GeoLocation(0.0, 0.0)
+                            geoLocation = GeoLocation(0.0, 0.0),
+                            rating = rating.toDouble(),
+                            userId = user!!.userId
                         )
-                        addEntryViewModel.insertEntryInClone(newEntryRanking ?: 0, newEntry)
-                        addEntryViewModel.commitClonedRankingsToUser()
-                        navController.popBackStack()
+                        addEntryViewModel.uploadImagesAndCreateEntry(imageUris, entryDetails, context )
+                    }else {
+                        Toast.makeText(context, "Please add an Activity Name", Toast.LENGTH_LONG).show()
                     }
+                }) {
+                    Text("Add Entry")
                 }
             }
         }
     }
+
+    if (showRatingPopup) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
+                .clickable(onClick = { showRatingPopup = false }),
+            contentAlignment = Alignment.Center
+        ) {
+            RatingSelectionPopup(addEntryViewModel) {
+                showRatingPopup = false
+            }
+        }
+    }
+}
+
+@Composable
+fun CroppedSquareImage(imageUri: Uri) {
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current).data(data = imageUri)
+            .apply<ImageRequest.Builder>(block = fun ImageRequest.Builder.() {
+                transformations(CircleCropTransformation())
+            }).build()
+    )
+    Image(
+        painter = painter,
+        contentDescription = "Cropped Image",
+        modifier = Modifier
+            .size(100.dp)
+            .clip(RoundedCornerShape(4.dp)),
+        contentScale = ContentScale.Crop
+    )
 }
 
 @Composable
@@ -161,74 +225,6 @@ fun LocationNameEntry(entryName: String, hasTitle: Boolean, modifier: Modifier, 
         )
     }
 }
-
-@Composable
-fun RankingDropdown(
-    addEntryViewModel: AddEntryScreenViewModel,
-    newEntryRank: Int?,
-    newEntryId: Int,
-    clonedRankings: RankingList?,
-    hasTitle: Boolean,
-    entryName: String,
-    description: String,
-    tags: MutableList<String>,
-    modifier: Modifier
-) {
-    var rankingExpanded by remember { mutableStateOf(false) }
-
-    Box (modifier = modifier){
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { rankingExpanded = !rankingExpanded }
-        ) {
-            Card(
-                shape = CircleShape,
-                elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
-                modifier = Modifier.size(50.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    Text(
-                        text = "%.2f".format((1-(newEntryRank!!).toFloat() / (clonedRankings!!.length()-1)) * 5),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier
-                            .background(Color.White, CircleShape)
-                            .padding(9.dp)
-                    )
-                }
-            }
-            Icon(
-                Icons.Default.ArrowDropDown,
-                contentDescription = "dropdown"
-            )
-        }
-        DropdownMenu(
-            expanded = rankingExpanded,
-            onDismissRequest = { rankingExpanded = false }) {
-            clonedRankings?.toList()?.forEachIndexed { index, entry ->
-                DropdownMenuItem(
-                    text = { Text("#${index + 1}: ${entry.title}") },
-                    onClick = {
-                        rankingExpanded = false
-                        addEntryViewModel.insertEntryInClone(index, Entry(
-                            id = newEntryId,
-                            title = if (hasTitle) entryName else "New Entry",
-                            pictures = listOf(), // Add picture URLs if necessary
-                            review = description,
-                            tags = tags.toList(),
-                            geoLocation = GeoLocation(0.0, 0.0) // Set appropriate geolocation
-                        ))
-                    }
-                )
-            }
-        }
-    }
-}
-
-
 
 @Composable
 fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
@@ -375,26 +371,9 @@ fun RatingBar(rating: Float) {
         // Covering Rectangle
         Box(
             Modifier
-                .matchParentSize() // Match the size of the Box
-                .background(Color.LightGray.copy(alpha = 0.5f)) // Slightly transparent
-                .offset(x = (50 * rating).dp) // Move the rectangle based on the rating
+                .matchParentSize()
+                .background(Color.LightGray.copy(alpha = 0.5f))
+                .offset(x = (50 * rating).dp)
         )
-    }
-}
-
-
-
-
-@Composable
-fun SubmitButton(onClick: () -> Unit) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 30.dp)
-    ) {
-        Button(onClick = onClick) {
-            Text("Add Entry")
-        }
     }
 }

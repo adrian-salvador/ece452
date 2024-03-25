@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import com.group22.cityspots.ui.theme.CityHangoutsTheme
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -26,11 +27,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.android.gms.auth.api.identity.Identity
-import com.group22.cityspots.model.RankingList
-import com.group22.cityspots.model.User
 import com.group22.cityspots.model.GoogleAuthUIClient
 import com.group22.cityspots.view.LoginScreen
-import com.group22.cityspots.model.SignInViewModel
+import com.group22.cityspots.viewmodel.SignInViewModel
 import com.group22.cityspots.view.ProfileScreen
 import com.group22.cityspots.view.AddEntryScreen
 import com.group22.cityspots.view.EntryScreen
@@ -38,6 +37,7 @@ import com.group22.cityspots.view.FriendsScreen
 import com.group22.cityspots.view.HomeScreen
 import com.group22.cityspots.view.RankingScreen
 import com.group22.cityspots.viewmodel.UserViewModel
+import com.group22.cityspots.viewmodel.UserViewModelFactory
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -47,29 +47,26 @@ class MainActivity : ComponentActivity() {
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
+    private lateinit var userViewModel: UserViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             CityHangoutsTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 
                     val navController = rememberNavController()
-                    val user = User(
-                        id = 123,
-                        name = "Alice",
-                        rankings = RankingList(mutableListOf()),
-                        total_entry_count = 0,
-                        friends = mutableListOf()
-                    )
-                    val userViewModel = UserViewModel(user)
+
                     NavHost(navController = navController, startDestination = "login") {
                         composable("login") {
                             val viewModel = viewModel<SignInViewModel>()
                             val state by viewModel.state.collectAsState()
+                            val user = googleAuthUIClient.getSignedInUser()
                             
                             LaunchedEffect(key1 = Unit) {
-                                if(googleAuthUIClient.getSignedInUser() != null) {
+                                if(user  != null) {
+                                    userViewModel = ViewModelProvider(this@MainActivity, UserViewModelFactory(user)).get(UserViewModel::class.java)
                                     navController.navigate("home")
                                 }
                             }
@@ -86,11 +83,11 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             )
-                            LaunchedEffect(key1 = state.isSignInSuccessful ){
-                                if (state.isSignInSuccessful){
+                            LaunchedEffect(key1 = state.isSignInSuccessful) {
+                                if (state.isSignInSuccessful) {
                                     Toast.makeText(
                                         applicationContext,
-                                        "Sign In Successul",
+                                        "Sign In Successful",
                                         Toast.LENGTH_LONG
                                     ).show()
                                     navController.navigate("home")
@@ -122,7 +119,7 @@ class MainActivity : ComponentActivity() {
                         composable("friends") { FriendsScreen(navController, userViewModel) }
                         composable("userProfile") {
                             ProfileScreen(
-                                userData = googleAuthUIClient.getSignedInUser(),
+                                userLoginData = googleAuthUIClient.getSignedInUser(),
                                 onSignOut = {
                                     lifecycleScope.launch {
                                         googleAuthUIClient.signOut()

@@ -18,11 +18,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.group22.cityspots.model.UserData
+import com.group22.cityspots.model.User
 
 @Composable
 fun ProfileScreen(
-    userData: UserData?,
+    userLoginData: User?,
     onSignOut: () -> Unit
 ){
     Column(
@@ -30,9 +30,9 @@ fun ProfileScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        if(userData?.profilePictureUrl != null){
+        if(userLoginData?.profilePictureUrl != null){
             AsyncImage(
-                model = userData.profilePictureUrl,
+                model = userLoginData.profilePictureUrl,
                 contentDescription = "Profile Picture",
                 modifier = Modifier
                     .size(150.dp)
@@ -41,9 +41,9 @@ fun ProfileScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
-        if(userData?.username != null) {
+        if(userLoginData?.username != null) {
             Text(
-                text = userData.username,
+                text = userLoginData.username,
                 textAlign = TextAlign.Center,
                 fontSize =  36.sp)
             Spacer(modifier = Modifier.height(16.dp))

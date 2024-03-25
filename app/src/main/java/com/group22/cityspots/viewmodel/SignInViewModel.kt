@@ -1,6 +1,8 @@
-package com.group22.cityspots.model
+package com.group22.cityspots.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.group22.cityspots.model.SignInResult
+import com.group22.cityspots.model.SignInState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

@@ -11,31 +11,28 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.group22.cityspots.model.Friend
-import com.group22.cityspots.model.User
 import com.group22.cityspots.viewmodel.UserViewModel
 
 @Composable
 fun FriendsScreen(navController: NavController, userViewModel: UserViewModel) {
-    val friends = mutableListOf<Friend>().apply {
-        addAll(userViewModel.getFriends() ?: emptyList())
-    }
-    Scaffold(
-        bottomBar = { BottomNavigationBar(navController = navController) }
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = "Friends",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                friends.forEach() { friend ->
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Name: ${friend.name}")
-                    Text("Username: ${friend.username}")        }
-            }
-        }
-    }
+//    val friends = mutableListOf<Friend>().apply {
+//        addAll(userViewModel.getFriends() ?: emptyList())
+//    }
+//    Scaffold(
+//        bottomBar = { BottomNavigationBar(navController = navController) }
+//    ) { innerPadding ->
+//        Box(modifier = Modifier.padding(innerPadding)) {
+//            Column(modifier = Modifier.padding(16.dp)) {
+//                Text(
+//                    text = "Friends",
+//                    style = MaterialTheme.typography.titleMedium
+//                )
+//                friends.forEach() { friend ->
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    Text("Name: ${friend.name}")
+//                    Text("Username: ${friend.username}")        }
+//            }
+//        }
+//    }
 }
