@@ -32,13 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
-import com.group22.cityspots.model.User
 import com.group22.cityspots.viewmodel.EntryViewModel
 import com.group22.cityspots.viewmodel.EntryViewModelFactory
-import com.group22.cityspots.viewmodel.RankingScreenViewModel
-import com.group22.cityspots.viewmodel.RankingScreenViewModelFactory
 import com.group22.cityspots.viewmodel.UserViewModel
 
 @Composable
