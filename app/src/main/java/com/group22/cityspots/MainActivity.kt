@@ -111,7 +111,7 @@ class MainActivity : ComponentActivity() {
                         composable("ranking") { RankingScreen(navController, userViewModel) }
                         composable(
                             route = "entry/{entryId}",
-                            arguments = listOf(navArgument("entryId") { type = NavType.IntType })
+                            arguments = listOf(navArgument("entryId") { type = NavType.StringType })
                         ) { backStackEntry ->
                             EntryScreen(navController, backStackEntry, userViewModel)
                         }
