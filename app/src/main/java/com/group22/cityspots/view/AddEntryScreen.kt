@@ -91,6 +91,8 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
         }
     )
 
+    var displayMap by remember {mutableStateOf(false)}
+
     val context = LocalContext.current
 
 
@@ -126,7 +128,9 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                 }
             }
 
-            DisplayLocation()
+            DisplayLocation {
+                displayMap = !displayMap
+            }
 
             DescriptionEntry(description) { newDescription ->
                 description = newDescription
@@ -198,6 +202,16 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
         ) {
             RatingSelectionPopup(addEntryViewModel) {
                 showRatingPopup = false
+            }
+        }
+    }
+
+    if (displayMap) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            MapScreen {
+                displayMap = false
             }
         }
     }
@@ -313,9 +327,10 @@ fun TagEntry(tags: MutableList<String>) {
 }
 
 @Composable
-fun DisplayLocation() {
+fun DisplayLocation(onClick: () -> Unit) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.clickable(onClick = onClick)
     ) {
         Surface(
             shape = RoundedCornerShape(16.dp),
