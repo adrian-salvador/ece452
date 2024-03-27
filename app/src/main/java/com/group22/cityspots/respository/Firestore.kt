@@ -76,8 +76,6 @@ class Firestore {
         }
     }
 
-
-
     suspend fun uploadPicture(imageData: ByteArray, userId: String, context: Context): String? {
         val storageRef = Firebase.storage.reference
         val imageRef = storageRef.child("images/$userId/${System.currentTimeMillis()}.jpg")
