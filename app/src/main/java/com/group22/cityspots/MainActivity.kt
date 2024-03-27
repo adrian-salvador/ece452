@@ -67,6 +67,7 @@ class MainActivity : ComponentActivity() {
                             LaunchedEffect(key1 = Unit) {
                                 if(user  != null) {
                                     userViewModel = ViewModelProvider(this@MainActivity, UserViewModelFactory(user)).get(UserViewModel::class.java)
+                                    userViewModel.saveUser(user, applicationContext)
                                     navController.navigate("home")
                                 }
                             }
@@ -84,7 +85,9 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                             LaunchedEffect(key1 = state.isSignInSuccessful) {
-                                if (state.isSignInSuccessful) {
+                                if (state.isSignInSuccessful && user!=null) {
+                                    userViewModel = ViewModelProvider(this@MainActivity, UserViewModelFactory(user)).get(UserViewModel::class.java)
+                                    userViewModel.saveUser(user, applicationContext)
                                     Toast.makeText(
                                         applicationContext,
                                         "Sign In Successful",
