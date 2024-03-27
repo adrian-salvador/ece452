@@ -21,3 +21,4 @@
 | 2024/03/24 |        |         | 7      |          |       |       | get firestore working with exisiting models                                                               |
 | 2024/03/25 |        |         | 5      |          |       |       | setup firebase storage to upload images in add entry page                                                 |
 | 2024/03/25 |        |         | 3      |          |       |       | change ranking system to display closest entries                                                          |
+| 2024/03/20 |        |         |        |          |       | 3     | finished example on deliverable 4                                                                         |
