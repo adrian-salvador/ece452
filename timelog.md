@@ -24,3 +24,4 @@
 | 2024/03/25 |        |         | 3      |          |       |       | change ranking system to display closest entries                                                          |
 | 2024/03/26 |        |         | 9      |          |       |       | Fix auth configuration on firebase to work with multiple unsigned users                                   |
 | 2024/03/27 |        |         |        |          | 5     |       | Google Maps Integration                                                                                   |
+| 2024/03/27 |        |         |        |          | 5     |       | Basic Google Places integration with the geolocation functionality                                        |
