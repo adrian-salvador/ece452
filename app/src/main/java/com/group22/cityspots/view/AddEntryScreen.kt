@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
@@ -62,6 +63,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.google.android.gms.maps.model.LatLng
 import com.group22.cityspots.model.Entry
 import com.group22.cityspots.model.GeoLocation
 import com.group22.cityspots.viewmodel.AddEntryViewModel
@@ -91,7 +93,8 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
         }
     )
 
-    var displayMap by remember {mutableStateOf(false)}
+    var displayMap by remember { mutableStateOf(false) }
+    val geolocation = remember { mutableStateOf<LatLng?>(null) }
 
     val context = LocalContext.current
 
@@ -128,9 +131,10 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                 }
             }
 
-            DisplayLocation {
-                displayMap = !displayMap
-            }
+            DisplayLocation(
+                onClick = {displayMap = !displayMap},
+                geoLocation = geolocation
+            )
 
             DescriptionEntry(description) { newDescription ->
                 description = newDescription
@@ -210,9 +214,10 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            MapScreen {
-                displayMap = false
-            }
+            MapScreen(
+                close = {displayMap = false},
+                selectedLocation = geolocation
+            )
         }
     }
 }
@@ -327,7 +332,7 @@ fun TagEntry(tags: MutableList<String>) {
 }
 
 @Composable
-fun DisplayLocation(onClick: () -> Unit) {
+fun DisplayLocation(onClick: () -> Unit, geoLocation: MutableState<LatLng?>) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.clickable(onClick = onClick)
@@ -348,7 +353,7 @@ fun DisplayLocation(onClick: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "New York City",
+                    text = geoLocation.value?.toString() ?: "Choose a Location",
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
             }
