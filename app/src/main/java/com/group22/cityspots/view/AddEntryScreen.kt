@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -51,7 +50,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -164,6 +162,7 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                             userId = user!!.userId
                         )
                         addEntryViewModel.uploadImagesAndCreateEntry(imageUris, entryDetails, context )
+                        navController.popBackStack()
                     }else {
                         Toast.makeText(context, "Please add an Activity Name", Toast.LENGTH_LONG).show()
                     }
