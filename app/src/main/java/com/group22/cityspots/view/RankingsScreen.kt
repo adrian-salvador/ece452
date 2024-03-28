@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
@@ -42,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -64,19 +67,25 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { innerPadding ->
-        Column {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .verticalScroll(
+                    rememberScrollState()
+                )
+                .padding(horizontal = 20.dp)
+        ) {
             Spacer(modifier = Modifier.height(20.dp))
             TextField(
                 value = newTag,
                 onValueChange = {
-                    newTag = it
+                    newTag = it.lowercase()
                 },
                 placeholder = {
                     Text(
                         text = "Filter Tags...",
                         color = Color(0xFFb2c5ff),
                         style = TextStyle(fontSize = 16.sp),
-                        modifier = Modifier.padding(start = 16.dp)
                     )
                 },
                 trailingIcon = {
@@ -104,13 +113,12 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
-                    .padding(horizontal = 20.dp)
             )
             Spacer(modifier = Modifier.height(10.dp))
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .padding(horizontal = 20.dp)
                     .height(30.dp)
             ) {
                 tags.value?.forEachIndexed { index, tag ->
@@ -124,8 +132,13 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(start = 10.dp, end = 5.dp, top = 5.dp, bottom = 5.dp)
-                        ){
+                            modifier = Modifier.padding(
+                                start = 10.dp,
+                                end = 5.dp,
+                                top = 5.dp,
+                                bottom = 5.dp
+                            )
+                        ) {
                             Text(
                                 text = tag,
                                 style = TextStyle(fontWeight = FontWeight.Bold),
@@ -139,20 +152,21 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                     }
                 }
             }
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(20.dp),
-                modifier = Modifier.padding(innerPadding),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
-            ) {
-                entries?.forEachIndexed() { index, entry ->
-                    item {
+            Spacer(modifier = Modifier.height(10.dp))
+            val chunkedEntries = entries?.chunked(2) ?: listOf()
+            chunkedEntries.forEachIndexed { rowIndex, rowEntries ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)
+                ) {
+                    rowEntries.forEachIndexed { columnIndex, entry ->
+                        // Calculate the continuous index based on row and column index
+                        val index = rowIndex * 2 + columnIndex // Assuming 2 entries per row
+
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .fillMaxSize()
-
+                                .weight(1f)
                                 .height(200.dp)
                                 .clip(RoundedCornerShape(20.dp))
                                 .background(Color(0xffd5d4d7))
@@ -207,7 +221,9 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                                             Color.Black.copy(alpha = 0.5f),
                                             RoundedCornerShape(15.dp)
                                         )
-                                        .padding(horizontal = 10.dp, vertical = 2.dp)
+                                        .padding(horizontal = 10.dp, vertical = 2.dp),
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 3
                                 )
                                 Spacer(modifier = Modifier.height(5.dp))
                                 Row(
@@ -234,6 +250,10 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                                     )
                                 }
                             }
+                        }
+                        // Add a spacer if there's only one item in this row to maintain the grid layout
+                        if (rowEntries.size < 2) {
+                            Spacer(modifier = Modifier.weight(1f))
                         }
                     }
                 }
