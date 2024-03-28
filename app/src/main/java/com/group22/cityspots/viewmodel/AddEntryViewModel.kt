@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 class AddEntryViewModel(private val userId: String) : ViewModel() {
     val ratingLiveData = MutableLiveData<Double>()
     val entriesLiveData = MutableLiveData<List<Entry>>()
+    val tags = MutableLiveData<List<String>>()
 
     init {
         ratingLiveData.value = 0.0
@@ -25,28 +26,46 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
         ratingLiveData.value = newRating
     }
 
+    fun addTag(tag: String) {
+        val currentTags = tags.value.orEmpty()
+        if (tag !in currentTags) {
+            val updatedTags = currentTags + tag
+            tags.postValue(updatedTags)
+        }
+    }
+
+    fun removeTag(tag: String) {
+        val currentTags = tags.value.orEmpty()
+        if (tag in currentTags) {
+            val updatedTags = currentTags.toMutableList().apply { remove(tag) }
+            tags.postValue(updatedTags)
+        }
+    }
+
     private fun loadEntries() {
         viewModelScope.launch {
-            val entries = Firestore().getEntriesByUserId(userId)
+            val entries = Firestore().getEntriesByUserId(userId).asReversed()
             entriesLiveData.postValue(entries)
         }
     }
-    fun getAdjacentEntriesForRating(rating: Double): Pair<Entry?, Entry?> {
+    fun getAdjacentEntriesIndicesForRating(rating: Double): Pair<Int?, Int?> {
         val entries = entriesLiveData.value ?: return Pair(null, null)
-        var previousEntry: Entry? = null
-        var nextEntry: Entry? = null
+        var previousEntryIndex: Int? = null
+        var nextEntryIndex: Int? = null
 
-        for (entry in entries) {
+        for ((index, entry) in entries.withIndex()) {
+            if (entry.rating <= rating ) {
+                previousEntryIndex = index
+            }
             if (entry.rating > rating) {
-                previousEntry = entry
-            } else if (entry.rating < rating) {
-                nextEntry = entry
+                nextEntryIndex = index
                 break
             }
         }
 
-        return Pair(previousEntry, nextEntry)
+        return Pair(previousEntryIndex, nextEntryIndex)
     }
+
     fun uploadImagesAndCreateEntry(images: List<Uri>, entryDetails: Entry, context: Context) {
         viewModelScope.launch {
             val imageUrls = images.map { uri ->

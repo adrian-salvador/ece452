@@ -20,10 +20,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.LocationOn
@@ -72,11 +75,12 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
     var entryName by remember { mutableStateOf("") }
     var hasTitle by remember { mutableStateOf(false) }
     var description by remember { mutableStateOf("") }
-    val tags = remember { mutableStateListOf("city", "nature") }
+
     val addEntryViewModel: AddEntryViewModel = viewModel(
         factory = AddEntryViewModelFactory(user!!.userId)
     )
-    val rating by addEntryViewModel.ratingLiveData.observeAsState(initial = -1)
+    val tags = addEntryViewModel.tags.observeAsState(listOf())
+    val rating by addEntryViewModel.ratingLiveData.observeAsState(0.00)
     var showRatingPopup by remember { mutableStateOf(false) }
 
     val imageUris = remember { mutableStateListOf<Uri>() }
@@ -90,27 +94,35 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
     val context = LocalContext.current
 
 
-    Box(modifier = Modifier.background(Color(0x2F84ABE4))
+    Box(modifier = Modifier
+        .background(Color(0x2F84ABE4))
         .padding(10.dp)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(5.dp),
-            modifier = Modifier.padding(18.dp)
+            modifier = Modifier.padding(18.dp).verticalScroll(rememberScrollState())
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                LocationNameEntry(entryName, hasTitle, Modifier.weight(3F)) { name, hasName ->
+                LocationNameEntry(entryName, hasTitle, Modifier.weight(1F)) { name, hasName ->
                     entryName = name
                     hasTitle = hasName
                 }
 
-                Spacer(modifier = Modifier.weight(1f))
-
-                Button(onClick = { showRatingPopup = true  }) {
+                Button(
+                    onClick = { showRatingPopup = true },
+                    modifier = Modifier.wrapContentWidth().widthIn(max = 150.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.Star,
+                        contentDescription = "No image available",
+                        modifier = Modifier.size(20.dp),
+                        tint = Color(0xfff8d675)
+                    )
                     Text(String.format("%.2f", rating), style = MaterialTheme.typography.bodyLarge)
+
                 }
             }
 
@@ -120,8 +132,11 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                 description = newDescription
             }
 
-            TagEntry(tags)
-            DisplayTags(tags)
+            TagEditorFragment(
+                tags = tags,
+                addTag = { tag -> addEntryViewModel.addTag(tag) },
+                removeTag = { tag -> addEntryViewModel.removeTag(tag) }
+            )
 
             // Display Selected Images
             Row(
@@ -156,7 +171,7 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                             title = entryName,
                             pictures = null,
                             review = description,
-                            tags = tags,
+                            tags = tags.value,
                             geoLocation = GeoLocation(0.0, 0.0),
                             rating = rating.toDouble(),
                             userId = user!!.userId
