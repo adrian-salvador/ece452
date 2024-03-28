@@ -347,29 +347,3 @@ fun DisplayTags(tags: List<String>) {
         }
     }
 }
-
-
-@Composable
-fun RatingBar(rating: Float) {
-    println(rating)
-    Box {
-        // Stars
-        Row {
-            repeat(5) {
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    contentDescription = "Star $it",
-                    tint = Color(0xFFFFA100),
-                )
-            }
-        }
-
-        // Covering Rectangle
-        Box(
-            Modifier
-                .matchParentSize()
-                .background(Color.LightGray.copy(alpha = 0.5f))
-                .offset(x = (50 * rating).dp)
-        )
-    }
-}

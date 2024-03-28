@@ -59,7 +59,8 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
     )
     val entries by rankingScreenViewModel.entriesLiveData.observeAsState()
     var newTag by remember { mutableStateOf("") }
-    val tags = remember { mutableStateListOf("city", "nature") }
+    val tags = rankingScreenViewModel.tags.observeAsState()
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { innerPadding ->
@@ -81,7 +82,7 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                 trailingIcon = {
                     IconButton(onClick = {
                         if (newTag.isNotBlank()) {
-                            tags.add(newTag)
+                            rankingScreenViewModel.addTag(newTag)
                             newTag = ""
                         }
                     }) {
@@ -112,13 +113,13 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                     .padding(horizontal = 20.dp)
                     .height(30.dp)
             ) {
-                tags.forEachIndexed { index, tag ->
+                tags.value?.forEachIndexed { index, tag ->
                     Surface(
                         shape = RoundedCornerShape(16.dp),
                         color = Color(0xFFDBE8F9),
                         contentColor = Color(0xFF176FF2),
                         modifier = Modifier.clickable {
-                            tags.removeAt(index)
+                            rankingScreenViewModel.removeTag(tag)
                         }
                     ) {
                         Row(
