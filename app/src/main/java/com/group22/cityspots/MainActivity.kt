@@ -2,6 +2,8 @@
 
 package com.group22.cityspots
 
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -27,6 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.libraries.places.api.Places
 import com.group22.cityspots.model.GoogleAuthUIClient
 import com.group22.cityspots.view.LoginScreen
 import com.group22.cityspots.viewmodel.SignInViewModel
@@ -51,7 +54,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val appInfo: ApplicationInfo = applicationContext.packageManager.getApplicationInfo(
+            applicationContext.packageName,
+            PackageManager.GET_META_DATA
+        )
+        val apiKey = appInfo.metaData.getString("com.google.android.geo.API_KEY")
+        Places.initializeWithNewPlacesApiEnabled(applicationContext, apiKey)
         setContent {
             CityHangoutsTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
