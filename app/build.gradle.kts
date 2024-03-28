@@ -50,6 +50,7 @@ android {
 dependencies {
     implementation("com.google.firebase:firebase-storage-ktx")
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")
+    implementation ("androidx.compose.material:material-icons-extended: 1.6.2")
     implementation("com.google.firebase:firebase-firestore")
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation("com.google.firebase:firebase-analytics")

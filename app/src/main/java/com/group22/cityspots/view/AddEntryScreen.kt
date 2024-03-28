@@ -26,10 +26,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -243,9 +245,10 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
                 focusedIndicatorColor = Color(0xFF84ABE4),
                 unfocusedIndicatorColor = Color.Transparent
             ),
+            shape = RoundedCornerShape(15.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .height(100.dp)
         )
     }
 }
@@ -253,52 +256,46 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
 @Composable
 fun TagEntry(tags: MutableList<String>) {
     var newTag by remember { mutableStateOf("") }
-    var tagBoxHasTag by remember { mutableStateOf(false) }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp)
-    ) {
-        Box(
-            contentAlignment = Alignment.CenterStart
-        ) {
-            TextField(
-                value = newTag,
-                onValueChange = {
-                    newTag = it
-                    tagBoxHasTag = it.isNotEmpty()
-                },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = {
-                    if (newTag.isNotBlank()) {
-                        tags.add(newTag)
-                        newTag = ""
-                        tagBoxHasTag = false
-                    }
-                }),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color(0xFFF3F8FE),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                shape = RoundedCornerShape(40.dp),
-                textStyle = TextStyle(fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
+    TextField(
+        value = newTag,
+        onValueChange = {
+            newTag = it
+        },
+        placeholder = {
+            Text(
+                text = "Filter Tags...",
+                color = Color(0xFFb2c5ff),
+                style = TextStyle(fontSize = 16.sp),
+                modifier = Modifier.padding(start = 16.dp)
             )
-            if (!tagBoxHasTag) {
-                Text(
-                    text = "Add Tags...",
-                    color = Color(0xFF176FF2),
-                    style = TextStyle(fontStyle = FontStyle.Italic, fontSize = 16.sp),
-                    modifier = Modifier.padding(start = 16.dp)
+        },
+        trailingIcon = {
+            IconButton(onClick = {
+                if (newTag.isNotBlank()) {
+                    tags.add(newTag)
+                    newTag = ""
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = null
                 )
             }
-        }
-    }
+        },
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color(0xFFF3F8FE),
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedTextColor = Color(0xFF176FF2),
+        ),
+        shape = RoundedCornerShape(40.dp),
+        textStyle = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+    )
 }
 
 @Composable
