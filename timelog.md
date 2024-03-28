@@ -25,3 +25,4 @@
 | 2024/03/26 |        |         | 9      |          |       |       | Fix auth configuration on firebase to work with multiple unsigned users                                   |
 | 2024/03/27 |        |         |        |          | 5     |       | Google Maps Integration                                                                                   |
 | 2024/03/27 |        |         |        |          | 5     |       | Basic Google Places integration with the geolocation functionality                                        |
+| 2024/03/27 |        |         | 6      |          |       |       | refactor and improve ranking screen ui and add ability to filter by tag                                   |
