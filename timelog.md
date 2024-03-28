@@ -23,3 +23,4 @@
 | 2024/03/25 |        |         | 5      |          |       |       | setup firebase storage to upload images in add entry page                                                 |
 | 2024/03/25 |        |         | 3      |          |       |       | change ranking system to display closest entries                                                          |
 | 2024/03/26 |        |         | 9      |          |       |       | Fix auth configuration on firebase to work with multiple unsigned users                                   |
+| 2024/03/27 |        |         |        |          | 5     |       | Google Maps Integration                                                                                   |
