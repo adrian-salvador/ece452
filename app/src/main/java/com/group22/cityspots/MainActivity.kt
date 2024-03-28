@@ -2,6 +2,7 @@
 
 package com.group22.cityspots
 
+import LoginScreen
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -28,7 +29,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.android.gms.auth.api.identity.Identity
 import com.group22.cityspots.model.GoogleAuthUIClient
-import com.group22.cityspots.view.LoginScreen
 import com.group22.cityspots.viewmodel.SignInViewModel
 import com.group22.cityspots.view.ProfileScreen
 import com.group22.cityspots.view.AddEntryScreen
