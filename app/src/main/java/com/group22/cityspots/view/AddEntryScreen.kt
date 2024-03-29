@@ -180,6 +180,7 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
                             review = description,
                             tags = tags.value,
                             placeId = mapViewModel.currentPlaceId,
+                            address = mapViewModel.currentAddress,
                             rating = rating.toDouble(),
                             userId = user!!.userId
                         )
