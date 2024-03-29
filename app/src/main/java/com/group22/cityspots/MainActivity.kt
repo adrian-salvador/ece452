@@ -31,14 +31,11 @@ import androidx.navigation.navArgument
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.libraries.places.api.Places
 import com.group22.cityspots.model.GoogleAuthUIClient
-import com.group22.cityspots.viewmodel.SignInViewModel
-import com.group22.cityspots.view.ProfileScreen
 import com.group22.cityspots.ui.theme.CityHangoutsTheme
 import com.group22.cityspots.view.AddEntryScreen
 import com.group22.cityspots.view.EntryScreen
 import com.group22.cityspots.view.FriendsScreen
 import com.group22.cityspots.view.HomeScreen
-import com.group22.cityspots.view.LoginScreen
 import com.group22.cityspots.view.ProfileScreen
 import com.group22.cityspots.view.RankingScreen
 import com.group22.cityspots.viewmodel.MapViewModel
