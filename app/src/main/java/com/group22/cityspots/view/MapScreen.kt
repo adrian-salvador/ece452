@@ -21,7 +21,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,11 +28,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
@@ -43,15 +40,14 @@ import com.group22.cityspots.viewmodel.MapViewModel
 
 @Composable
 fun MapScreen(
-    viewModel: MapViewModel = MapViewModel(LocalContext.current),
-    selectedLocation: MutableState<LatLng?>,
+    viewModel: MapViewModel,
     close: () -> Unit
 ) {
     val uiSettings = remember{MapUiSettings()}
     val cameraPositionState = rememberCameraPositionState{
         position = CameraPosition.fromLatLngZoom(
-            selectedLocation.value ?: LatLng(43.4668, -80.51639),
-            15f
+            viewModel.currentLatLong,
+            18f
         )
     }
     LaunchedEffect(viewModel.currentLatLong) {
@@ -65,18 +61,12 @@ fun MapScreen(
                 .padding(innerPadding),
             properties = viewModel.state.properties,
             uiSettings = uiSettings,
-            onMapClick = {
-                selectedLocation.value = it
-            }
         ) {
-            selectedLocation.value?.let {
-                Marker(
-                    state = MarkerState(it),
-                    draggable = true,
-                    title = "Activity Location",
-                    snippet = "${selectedLocation.value?.longitude}, ${selectedLocation.value?.latitude}"
-                )
-            }
+            Marker(
+                state = MarkerState(viewModel.currentLatLong),
+                draggable = false,
+                title = viewModel.currentPlace
+            )
         }
         Box(
             modifier = Modifier.fillMaxSize(),

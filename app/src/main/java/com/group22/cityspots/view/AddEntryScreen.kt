@@ -1,6 +1,7 @@
 package com.group22.cityspots.view
 
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,7 +41,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
@@ -63,16 +63,16 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.google.android.gms.maps.model.LatLng
 import com.group22.cityspots.model.Entry
 import com.group22.cityspots.model.GeoLocation
 import com.group22.cityspots.viewmodel.AddEntryViewModel
 import com.group22.cityspots.viewmodel.AddEntryViewModelFactory
+import com.group22.cityspots.viewmodel.MapViewModel
 import com.group22.cityspots.viewmodel.UserViewModel
 
 
 @Composable
-fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
+fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, mapViewModel: MapViewModel) {
     val user by userViewModel.userLiveData.observeAsState()
     var entryName by remember { mutableStateOf("") }
     var hasTitle by remember { mutableStateOf(false) }
@@ -94,7 +94,6 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
     )
 
     var displayMap by remember { mutableStateOf(false) }
-    val geolocation = remember { mutableStateOf<LatLng?>(null) }
 
     val context = LocalContext.current
 
@@ -133,7 +132,7 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
 
             DisplayLocation(
                 onClick = {displayMap = !displayMap},
-                geoLocation = geolocation
+                mapViewModel = mapViewModel
             )
 
             DescriptionEntry(description) { newDescription ->
@@ -216,7 +215,7 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
         ) {
             MapScreen(
                 close = {displayMap = false},
-                selectedLocation = geolocation
+                viewModel = mapViewModel
             )
         }
     }
@@ -332,7 +331,7 @@ fun TagEntry(tags: MutableList<String>) {
 }
 
 @Composable
-fun DisplayLocation(onClick: () -> Unit, geoLocation: MutableState<LatLng?>) {
+fun DisplayLocation(onClick: () -> Unit, mapViewModel: MapViewModel) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.clickable(onClick = onClick)
@@ -352,8 +351,9 @@ fun DisplayLocation(onClick: () -> Unit, geoLocation: MutableState<LatLng?>) {
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
+                Log.d("hehexd", "AddEntryScreen: mapViewModel.currentPlace = ${mapViewModel.currentPlace}")
                 Text(
-                    text = geoLocation.value?.toString() ?: "Choose a Location",
+                    text = mapViewModel.currentPlace,
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
             }
