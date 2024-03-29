@@ -30,4 +30,4 @@
 | 2024/03/29 |        |         |        |          | 3     |       | Polished the Google Maps / Places integration                                                             |
 | 2024/03/28 |        |         |        |          |       | 5     | Designed and implmented the Trip class in the app and database                                                             |
 | 2024/03/28 |        |         |        |          |       | 5     | Debugging android studio emulator                                                             |
-| 2024/03/29 |        |         |        |          |       | 5     | implemented the tripviewmodel to get all trips for a selected user, select trip when adding an entry, view trip when viewing an entry                                                             |
+| 2024/03/29 |        |         |        |          |       | 5     | Implemented the tripviewmodel to get all trips for a selected user, select trip when adding an entry, view trip when viewing an entry                                                             |
