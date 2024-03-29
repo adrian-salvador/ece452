@@ -3,7 +3,10 @@
 package com.group22.cityspots
 
 import LoginScreen
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -11,14 +14,21 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.group22.cityspots.ui.theme.CityHangoutsTheme
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -63,6 +73,8 @@ class MainActivity : ComponentActivity() {
                             val viewModel = viewModel<SignInViewModel>()
                             val state by viewModel.state.collectAsState()
                             val user = googleAuthUIClient.getSignedInUser()
+                            var showDialog by remember { mutableStateOf(false) }
+                            val context = LocalContext.current
                             
                             LaunchedEffect(key1 = Unit) {
                                 if(user  != null) {
@@ -94,6 +106,8 @@ class MainActivity : ComponentActivity() {
                                         Toast.LENGTH_LONG
                                     ).show()
                                     navController.navigate("home")
+                                } else if (state.signInError != null) {
+                                    showDialog = true;
                                 }
                             }
                             LoginScreen(
@@ -101,6 +115,9 @@ class MainActivity : ComponentActivity() {
                                 onSignInClick = {
                                     lifecycleScope.launch {
                                         val signInIntent = googleAuthUIClient.signIn()
+                                        if (signInIntent == null){
+                                            showDialog = true;
+                                        }
                                         launcher.launch(
                                             IntentSenderRequest.Builder(
                                                 signInIntent ?: return@launch
@@ -109,6 +126,32 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             )
+                            if (showDialog){
+                                AlertDialog(
+                                    onDismissRequest = { showDialog = false },
+                                    title = { Text(text = "Google Account Required") },
+                                    text = { Text(text = "This app requires a Google account for authentication. Would you like to add one now?") },
+                                    confirmButton = {
+                                        Button(
+                                            onClick = {
+                                                showDialog = false
+                                                val addAccountIntent = Intent(Settings.ACTION_ADD_ACCOUNT)
+                                                addAccountIntent.putExtra(Settings.EXTRA_ACCOUNT_TYPES, arrayOf("com.google"))
+                                                context.startActivity(addAccountIntent)
+                                            }
+                                        ) {
+                                            Text("Add Account")
+                                        }
+                                    },
+                                    dismissButton = {
+                                        Button(
+                                            onClick = { showDialog = false }
+                                        ) {
+                                            Text("Cancel")
+                                        }
+                                    }
+                                )
+                            }
                         }
                         composable("home") { HomeScreen(navController, userViewModel) }
                         composable("ranking") { RankingScreen(navController, userViewModel) }
