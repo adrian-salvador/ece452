@@ -32,3 +32,4 @@
 | 2024/03/28 |        |         |        |          |       | 5     | Debugging android studio emulator                                                                         |
 | 2024/03/29 |        |         |        |          |       | 5     | Implemented the tripviewmodel to get all trips for a selected user, select trip when adding an entry, view trip when viewing an entry|
 | 2024/03/29 |        |         |        |          | 2     |       | deliverbale 5                                                                                             |
+| 2024/03/29 |        |         |        |          | 3     |       | helped with home page city filter integration                                                             | 
