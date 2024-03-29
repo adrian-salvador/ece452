@@ -81,7 +81,7 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
                 pictures = imageUrls.filterNotNull(),
                 review = entryDetails.review,
                 tags = entryDetails.tags,
-                geoLocation = entryDetails.geoLocation,
+                placeId = entryDetails.placeId,
                 rating = ratingLiveData.value ?: 0.0,
                 userId = userId
             )

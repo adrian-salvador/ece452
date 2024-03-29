@@ -25,7 +25,8 @@ class MapViewModel(context: Context) : ViewModel() {
     val locationAutofill = mutableStateListOf<AutocompleteResult>()
     private val placesClient: PlacesClient = Places.createClient(context)
     var currentLatLong by mutableStateOf(LatLng(43.4668, -80.51639))
-    var currentPlace by mutableStateOf("Waterloo")
+    var currentPlace by mutableStateOf("Select Location")
+    var currentPlaceId by mutableStateOf("")
     private var job: Job? = null
 
     fun searchPlaces(query: String) {
@@ -57,6 +58,7 @@ class MapViewModel(context: Context) : ViewModel() {
         val placeFields = listOf(Place.Field.LAT_LNG)
         val request = FetchPlaceRequest.newInstance(result.placeId, placeFields)
         currentPlace = result.address.split(",")[0]
+        currentPlaceId = result.placeId
         placesClient.fetchPlace(request)
             .addOnSuccessListener {
                 if (it != null) {

@@ -122,8 +122,10 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                             Modifier.padding(start = 20.dp)
                         ) {
                             Text(
-                                text = "${currentEntry.geoLocation.longitude}°, " +
-                                        "${currentEntry.geoLocation.latitude}°"
+//                                text = "${currentEntry.geoLocation.longitude}°, " +
+//                                        "${currentEntry.geoLocation.latitude}°"
+                                text = "Placeholder"
+                                // TODO: Retrieve name of the place via Google Places API via placeId
                             )
                         }
                     }

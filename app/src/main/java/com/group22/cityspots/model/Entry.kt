@@ -6,7 +6,7 @@ data class Entry(
     val pictures: List<String>? = null,
     val review: String = "",
     val tags: List<String> = emptyList(),
-    val geoLocation: GeoLocation = GeoLocation(0.0, 0.0),
+    val placeId: String = "",
     val rating: Double = 0.0,
     val userId: String = ""
 )
