@@ -4,15 +4,15 @@ import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.google.android.libraries.places.api.net.PlacesClient
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -23,8 +23,8 @@ data class AutocompleteResult(
 class MapViewModel(context: Context) : ViewModel() {
     var state by mutableStateOf(MapState())
     val locationAutofill = mutableStateListOf<AutocompleteResult>()
-    val placesClient = Places.createClient(context)
-    var currentLatLong by mutableStateOf(LatLng(0.0, 0.0))
+    private val placesClient: PlacesClient = Places.createClient(context)
+    var currentLatLong by mutableStateOf(LatLng(43.4668, -80.51639))
     private var job: Job? = null
 
     fun searchPlaces(query: String) {
