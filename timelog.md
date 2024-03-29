@@ -28,6 +28,7 @@
 | 2024/03/27 |        |         | 6      |          |       |       | refactor and improve ranking screen ui and add ability to filter by tag                                   |
 | 2024/03/28 |        |         |        |          | 6     |       | Bug fixing for the Google Places / Maps not bringing the view to the correct location                     |
 | 2024/03/29 |        |         |        |          | 3     |       | Polished the Google Maps / Places integration                                                             |
-| 2024/03/28 |        |         |        |          |       | 5     | Designed and implmented the Trip class in the app and database                                                             |
-| 2024/03/28 |        |         |        |          |       | 5     | Debugging android studio emulator                                                             |
-| 2024/03/29 |        |         |        |          |       | 5     | Implemented the tripviewmodel to get all trips for a selected user, select trip when adding an entry, view trip when viewing an entry                                                             |
+| 2024/03/28 |        |         |        |          |       | 5     | Designed and implmented the Trip class in the app and database                                            |
+| 2024/03/28 |        |         |        |          |       | 5     | Debugging android studio emulator                                                                         |
+| 2024/03/29 |        |         |        |          |       | 5     | Implemented the tripviewmodel to get all trips for a selected user, select trip when adding an entry, view trip when viewing an entry|
+| 2024/03/29 |        |         |        |          | 2     |       | deliverbale 5                                                                                             |
