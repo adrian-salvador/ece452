@@ -3,6 +3,8 @@
 package com.group22.cityspots
 
 import LoginScreen
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -16,7 +18,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.group22.cityspots.ui.theme.CityHangoutsTheme
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
@@ -28,14 +29,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.libraries.places.api.Places
 import com.group22.cityspots.model.GoogleAuthUIClient
-import com.group22.cityspots.viewmodel.SignInViewModel
-import com.group22.cityspots.view.ProfileScreen
+import com.group22.cityspots.ui.theme.CityHangoutsTheme
 import com.group22.cityspots.view.AddEntryScreen
 import com.group22.cityspots.view.EntryScreen
 import com.group22.cityspots.view.FriendsScreen
 import com.group22.cityspots.view.HomeScreen
+import com.group22.cityspots.view.ProfileScreen
 import com.group22.cityspots.view.RankingScreen
+import com.group22.cityspots.viewmodel.MapViewModel
+import com.group22.cityspots.viewmodel.SignInViewModel
 import com.group22.cityspots.viewmodel.UserViewModel
 import com.group22.cityspots.viewmodel.UserViewModelFactory
 import kotlinx.coroutines.launch
@@ -48,10 +52,17 @@ class MainActivity : ComponentActivity() {
         )
     }
     private lateinit var userViewModel: UserViewModel
+    private lateinit var mapViewModel: MapViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        val appInfo: ApplicationInfo = applicationContext.packageManager.getApplicationInfo(
+            applicationContext.packageName,
+            PackageManager.GET_META_DATA
+        )
+        val apiKey = appInfo.metaData.getString("com.google.android.geo.API_KEY")
+        Places.initializeWithNewPlacesApiEnabled(applicationContext, apiKey)
+        mapViewModel = MapViewModel(applicationContext)
         setContent {
             CityHangoutsTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -118,7 +129,7 @@ class MainActivity : ComponentActivity() {
                         ) { backStackEntry ->
                             EntryScreen(navController, backStackEntry, userViewModel)
                         }
-                        composable("addEntry") { AddEntryScreen(navController, userViewModel) }
+                        composable("addEntry") { AddEntryScreen(navController, userViewModel, mapViewModel) }
                         composable("friends") { FriendsScreen(navController, userViewModel) }
                         composable("userProfile") {
                             ProfileScreen(
