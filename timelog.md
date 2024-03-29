@@ -27,3 +27,4 @@
 | 2024/03/27 |        |         |        |          | 5     |       | Basic Google Places integration with the geolocation functionality                                        |
 | 2024/03/27 |        |         | 6      |          |       |       | refactor and improve ranking screen ui and add ability to filter by tag                                   |
 | 2024/03/28 |        |         |        |          | 6     |       | Bug fixing for the Google Places / Maps not bringing the view to the correct location                     |
+| 2024/03/29 |        |         |        |          | 3     |       | Polished the Google Maps / Places integration                                                             |
