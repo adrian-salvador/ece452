@@ -1,5 +1,6 @@
 package com.group22.cityspots.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -138,8 +139,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                             Modifier.padding(start = 20.dp)
                         ) {
                             Text(
-                                text = "${currentEntry.geoLocation.longitude}°, " +
-                                        "${currentEntry.geoLocation.latitude}°"
+                                text = if (currentEntry.address.isNotEmpty()) currentEntry.address else "No Location Data"
                             )
                         }
                     }

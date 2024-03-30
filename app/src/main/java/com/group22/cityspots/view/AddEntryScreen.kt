@@ -1,6 +1,7 @@
  package com.group22.cityspots.view
 
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -70,13 +71,14 @@ import com.group22.cityspots.model.GeoLocation
 import com.group22.cityspots.model.Trip
 import com.group22.cityspots.viewmodel.AddEntryViewModel
 import com.group22.cityspots.viewmodel.AddEntryViewModelFactory
+import com.group22.cityspots.viewmodel.MapViewModel
 import com.group22.cityspots.viewmodel.UserViewModel
 import com.group22.cityspots.viewmodel.TripViewModel
 import com.group22.cityspots.viewmodel.TripViewModelFactory
 
 
 @Composable
-fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
+fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, mapViewModel: MapViewModel) {
     val user by userViewModel.userLiveData.observeAsState()
     var entryName by remember { mutableStateOf("") }
     var hasTitle by remember { mutableStateOf(false) }
@@ -104,6 +106,9 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
     fun refreshTrips() {
         tripViewModel.refreshTrips() // This function should refresh the tripsLiveData in your ViewModel
     }
+
+    var displayMap by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
 
     Box(modifier = Modifier
@@ -138,7 +143,10 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                 }
             }
 
-            DisplayLocation()
+            DisplayLocation(
+                onClick = {displayMap = !displayMap},
+                mapViewModel = mapViewModel
+            )
 
             TripEntry(trips ?: emptyList<Trip>(), tripId, user!!.userId, showAddTripCallback) { newTripId ->
                 tripId = newTripId
@@ -190,6 +198,8 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                             tags = tags.value,
                             tripId = tripId,
                             geoLocation = GeoLocation(0.0, 0.0),
+                            placeId = mapViewModel.currentPlaceId,
+                            address = mapViewModel.currentAddress,
                             rating = rating.toDouble(),
                             userId = user!!.userId
                         )
@@ -231,6 +241,17 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                 showAddTrip = false
                 refreshTrips()
             }
+        }
+    }
+
+    if (displayMap) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            MapScreen(
+                close = {displayMap = false},
+                viewModel = mapViewModel
+            )
         }
     }
 }
@@ -437,9 +458,10 @@ fun TagEntry(tags: MutableList<String>) {
 }
 
 @Composable
-fun DisplayLocation() {
+fun DisplayLocation(onClick: () -> Unit, mapViewModel: MapViewModel) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.clickable(onClick = onClick)
     ) {
         Surface(
             shape = RoundedCornerShape(16.dp),
@@ -456,8 +478,9 @@ fun DisplayLocation() {
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
+                Log.d("hehexd", "AddEntryScreen: mapViewModel.currentPlace = ${mapViewModel.currentPlace}")
                 Text(
-                    text = "New York City",
+                    text = mapViewModel.currentPlace,
                     style = TextStyle(fontWeight = FontWeight.Bold)
                 )
             }
