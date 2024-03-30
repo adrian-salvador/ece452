@@ -80,6 +80,7 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
                 title = entryDetails.title,
                 pictures = imageUrls.filterNotNull(),
                 review = entryDetails.review,
+                tripId = entryDetails.tripId,
                 tags = entryDetails.tags,
                 placeId = entryDetails.placeId,
                 address = entryDetails.address,

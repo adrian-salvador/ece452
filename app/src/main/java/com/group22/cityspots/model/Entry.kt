@@ -9,6 +9,7 @@ data class Entry(
     val placeId: String = "",
     val address: String = "",
     val rating: Double = 0.0,
-    val userId: String = ""
+    val userId: String = "",
+    val tripId: String = ""
 )
 

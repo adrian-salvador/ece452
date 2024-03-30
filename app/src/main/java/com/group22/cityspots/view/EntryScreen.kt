@@ -25,6 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +39,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.group22.cityspots.viewmodel.EntryViewModel
 import com.group22.cityspots.viewmodel.EntryViewModelFactory
+import com.group22.cityspots.viewmodel.TripViewModel
+import com.group22.cityspots.viewmodel.TripViewModelFactory
 import com.group22.cityspots.viewmodel.UserViewModel
 
 @Composable
@@ -48,6 +53,17 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
     println(entryId)
     val entries by rankingScreenViewModel.entriesLiveData.observeAsState()
     val currentEntry = entries?.find { entry -> entry.entryId == entryId }
+    val tripViewModel: TripViewModel = viewModel(
+        factory = TripViewModelFactory(user!!.userId)
+    )
+    val trips by tripViewModel.tripsLiveData.observeAsState()
+    var selectedTrip by remember { mutableStateOf("") }
+    trips?.forEach { trip ->
+        if (trip.tripId == currentEntry?.tripId) {
+            selectedTrip = trip.title
+            return@forEach
+        }
+    }
 
     Scaffold (
         bottomBar = { BottomNavigationBar(navController = navController) }
@@ -129,6 +145,31 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                     }
 
                     Spacer(modifier = Modifier.height(30.dp))
+
+                    if (selectedTrip.isNotEmpty()) {
+                        Text(
+                            modifier = Modifier.padding(start = 20.dp),
+                            style = MaterialTheme.typography.titleMedium,
+                            text = "Trip"
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Row {
+                            Spacer(modifier = Modifier.padding(start = 20.dp))
+
+                            Box(
+                                Modifier
+                                    .clip(RoundedCornerShape(10))
+                                    .background(Color.LightGray)
+                                    .padding(20.dp)
+                            ) {
+                                Text(text = selectedTrip)
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(30.dp))
+                    }
 
                     Text(
                         modifier = Modifier.padding(start = 20.dp),
