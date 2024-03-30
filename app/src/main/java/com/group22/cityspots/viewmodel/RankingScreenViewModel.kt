@@ -6,17 +6,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.group22.cityspots.model.Entry
+import com.group22.cityspots.model.Trip
 import com.group22.cityspots.respository.Firestore
 import kotlinx.coroutines.launch
 
 class RankingScreenViewModel(private val userId: String) : ViewModel() {
     private var originalEntries = listOf<Entry>()
     private val _entriesLiveData = MutableLiveData<List<Entry>>()
-    val entriesLiveData: LiveData<List<Entry>> = _entriesLiveData
-    val tags = MutableLiveData<List<String>>()
+    private var originalTrips = listOf<Trip>()
+    private val _tripsLiveData = MutableLiveData<List<Trip>>()
+    val tripsLiveData: LiveData<List<Trip>> = _tripsLiveData
+    val entriesLiveData: MutableLiveData<List<Entry>> = _entriesLiveData
+    val tags = MutableLiveData<List<String>>(listOf())
+    val selectedTrip: MutableLiveData<Trip?> = MutableLiveData<Trip?>()
 
     init {
         loadEntries()
+        loadTrips()
     }
 
     private fun loadEntries() {
@@ -27,12 +33,21 @@ class RankingScreenViewModel(private val userId: String) : ViewModel() {
         }
     }
 
+    private fun loadTrips() {
+        viewModelScope.launch {
+            val trips = Firestore().getTripsByUserId(userId)
+            originalTrips = trips
+            _tripsLiveData.postValue(trips)
+        }
+    }
+
     fun addTag(tag: String) {
         val currentTags = tags.value.orEmpty()
         if (tag !in currentTags) {
             val updatedTags = currentTags + tag
             tags.postValue(updatedTags)
             applyTagFilter(updatedTags)
+            applyTripFilter(selectedTrip.value)
         }
     }
 
@@ -42,12 +57,14 @@ class RankingScreenViewModel(private val userId: String) : ViewModel() {
             val updatedTags = currentTags.toMutableList().apply { remove(tag) }
             tags.postValue(updatedTags)
             applyTagFilter(updatedTags)
+            applyTripFilter(selectedTrip.value)
         }
     }
 
 
     fun applyTagFilter(tagsToFilter: List<String>) {
         if (tagsToFilter.isEmpty()) {
+
             _entriesLiveData.postValue(originalEntries)
             println(tagsToFilter)
         } else {
@@ -59,6 +76,24 @@ class RankingScreenViewModel(private val userId: String) : ViewModel() {
         }
     }
 
+    fun applyTripFilter(trip: Trip?) {
+        val currentSelectedTrip = trip
+        if (currentSelectedTrip != null) {
+            val filteredEntries = entriesLiveData.value?.filter { entry ->
+                entry.tripId == currentSelectedTrip.tripId
+            }
+            _entriesLiveData.postValue(filteredEntries ?: listOf())
+        } else {
+            applyTagFilter(tags.value ?: listOf())
+        }
+    }
+
+
+
+    fun setSelectedTrip(trip: Trip?) {
+        selectedTrip.postValue(trip)
+        applyTripFilter(trip)
+    }
 }
 
 class RankingScreenViewModelFactory(private val userId: String) : ViewModelProvider.Factory {

@@ -21,6 +21,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -55,6 +57,8 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
     val entries by rankingScreenViewModel.entriesLiveData.observeAsState()
     val tags = rankingScreenViewModel.tags.observeAsState()
     var expanded by remember { mutableStateOf(false) }
+    val trips by rankingScreenViewModel.tripsLiveData.observeAsState(listOf())
+    val selectedTrip by rankingScreenViewModel.selectedTrip.observeAsState()
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
@@ -85,14 +89,42 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                         )
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Hello", modifier = Modifier.weight(1f))
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = "Dropdown",
+                        // Text field to display the selected trip's title
+                        Text(
+                            text = selectedTrip?.title ?: "Select a trip",
                             modifier = Modifier
-                                .size(24.dp)
-                                .align(Alignment.CenterVertically)
+                                .clickable { expanded = true }
+                                .background(Color.White)
+                                .padding(start = 48.dp, end = 136.dp),
+                            color = Color.Black
                         )
+
+                        // Dropdown menu
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            DropdownMenuItem(
+                                modifier = Modifier
+                                    .padding(start = 48.dp, end = 136.dp)
+                                    .background(Color.White),
+                                text = { Text("All") },
+                                onClick = {
+                                    rankingScreenViewModel.setSelectedTrip(null)
+                                    expanded = false
+                                }
+                            )
+                            trips.forEach { trip ->
+                                DropdownMenuItem(
+                                    text = { Text(trip.title) },
+                                    onClick = {
+                                        rankingScreenViewModel.setSelectedTrip(trip)
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
