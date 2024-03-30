@@ -72,7 +72,9 @@ class MainActivity : ComponentActivity() {
             PackageManager.GET_META_DATA
         )
         val apiKey = appInfo.metaData.getString("com.google.android.geo.API_KEY")
-        Places.initializeWithNewPlacesApiEnabled(applicationContext, apiKey)
+        if (apiKey != null) {
+            Places.initializeWithNewPlacesApiEnabled(applicationContext, apiKey)
+        }
         mapViewModel = MapViewModel(applicationContext)
         setContent {
             CityHangoutsTheme {
