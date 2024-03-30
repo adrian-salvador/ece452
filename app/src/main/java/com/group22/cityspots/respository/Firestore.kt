@@ -8,6 +8,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.group22.cityspots.model.Entry
 import com.group22.cityspots.model.User
+import com.group22.cityspots.model.Trip
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,6 +18,7 @@ import kotlinx.coroutines.withContext
 class Firestore {
     private val entriesCollectionRef = Firebase.firestore.collection("entries")
     private val usersCollectionRef = Firebase.firestore.collection("users")
+    private val tripsCollectionRef = Firebase.firestore.collection("trips")
     fun saveUser(user: User, context: Context) = CoroutineScope(Dispatchers.IO).launch {
         try {
             val querySnapshot = usersCollectionRef.whereEqualTo("userId", user.userId).get().await()
@@ -54,6 +56,21 @@ class Firestore {
         }
     }
 
+    fun saveTrip(trip: Trip, context: Context) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val documentReference = tripsCollectionRef.add(trip).await()
+            val tripId = documentReference.id
+            tripsCollectionRef.document(tripId).update("tripId", tripId).await()
+
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "Successfully Saved Trip", Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
     suspend fun getEntriesByUserId(userId: String): List<Entry> = withContext(Dispatchers.IO) {
         try {
@@ -73,6 +90,27 @@ class Firestore {
         } catch (e: Exception) {
             println("Error fetching entries $e")
             emptyList<Entry>()
+        }
+    }
+
+    suspend fun getTripsByUserId(userId: String): List<Trip> = withContext(Dispatchers.IO) {
+        try {
+            println("User Id $userId")
+            val querySnapshot = tripsCollectionRef
+                .whereEqualTo("userId", userId)
+                .orderBy("title", Query.Direction.ASCENDING) // Sorting by title in ascending order
+                .get().await()
+
+            val list = querySnapshot.documents.mapNotNull { document ->
+                document.toObject(Trip::class.java)
+            }
+
+            println("Query Data $list")
+            return@withContext list
+
+        } catch (e: Exception) {
+            println("Error fetching trips $e")
+            emptyList<Trip>()
         }
     }
 

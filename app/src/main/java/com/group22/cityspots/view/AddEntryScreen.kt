@@ -1,4 +1,4 @@
-package com.group22.cityspots.view
+ package com.group22.cityspots.view
 
 import android.net.Uri
 import android.widget.Toast
@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,6 +29,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -39,6 +40,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -64,9 +67,12 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.group22.cityspots.model.Entry
 import com.group22.cityspots.model.GeoLocation
+import com.group22.cityspots.model.Trip
 import com.group22.cityspots.viewmodel.AddEntryViewModel
 import com.group22.cityspots.viewmodel.AddEntryViewModelFactory
 import com.group22.cityspots.viewmodel.UserViewModel
+import com.group22.cityspots.viewmodel.TripViewModel
+import com.group22.cityspots.viewmodel.TripViewModelFactory
 
 
 @Composable
@@ -75,14 +81,19 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
     var entryName by remember { mutableStateOf("") }
     var hasTitle by remember { mutableStateOf(false) }
     var description by remember { mutableStateOf("") }
-
+    var tripId by remember { mutableStateOf("") }
+    val tripViewModel: TripViewModel = viewModel(
+        factory = TripViewModelFactory(user!!.userId)
+    )
+    val trips by tripViewModel.tripsLiveData.observeAsState()
     val addEntryViewModel: AddEntryViewModel = viewModel(
         factory = AddEntryViewModelFactory(user!!.userId)
     )
     val tags = addEntryViewModel.tags.observeAsState(listOf())
     val rating by addEntryViewModel.ratingLiveData.observeAsState(0.00)
     var showRatingPopup by remember { mutableStateOf(false) }
-
+    var showAddTrip by remember { mutableStateOf(false) }
+    val showAddTripCallback: () -> Unit = { showAddTrip = true }
     val imageUris = remember { mutableStateListOf<Uri>() }
     val pickImagesLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -90,9 +101,10 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
             uri?.let { imageUris.add(it) }
         }
     )
-
+    fun refreshTrips() {
+        tripViewModel.refreshTrips() // This function should refresh the tripsLiveData in your ViewModel
+    }
     val context = LocalContext.current
-
 
     Box(modifier = Modifier
         .background(Color(0x2F84ABE4))
@@ -127,6 +139,10 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
             }
 
             DisplayLocation()
+
+            TripEntry(trips ?: emptyList<Trip>(), tripId, user!!.userId, showAddTripCallback) { newTripId ->
+                tripId = newTripId
+            }
 
             DescriptionEntry(description) { newDescription ->
                 description = newDescription
@@ -172,6 +188,7 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
                             pictures = null,
                             review = description,
                             tags = tags.value,
+                            tripId = tripId,
                             geoLocation = GeoLocation(0.0, 0.0),
                             rating = rating.toDouble(),
                             userId = user!!.userId
@@ -198,6 +215,21 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel) {
         ) {
             RatingSelectionPopup(addEntryViewModel) {
                 showRatingPopup = false
+            }
+        }
+    }
+
+    if (showAddTrip) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
+                .clickable(onClick = { showAddTrip = false }),
+            contentAlignment = Alignment.Center
+        ) {
+            AddTripPopup(user!!.userId) {
+                showAddTrip = false
+                refreshTrips()
             }
         }
     }
@@ -267,7 +299,99 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
     }
 }
 
-@Composable
+ @Composable
+ fun TripEntry(trips: List<Trip>, tripId: String, userId: String, showAddTripCallback: () -> Unit, onValueChange: (String) -> Unit) {
+     var expanded by remember { mutableStateOf(false) }
+     var selectedTrip by remember { mutableStateOf("") }
+     trips.forEach { trip ->
+         if (trip.tripId == tripId) {
+             selectedTrip = trip.title
+             return@forEach
+         }
+     }
+
+     Row(
+         modifier = Modifier
+             .fillMaxWidth()
+             .padding(top = 15.dp)
+             .clip(RoundedCornerShape(15.dp))
+             .background(Color.White) // Set background color to white
+     ) {
+         Column(
+             modifier = Modifier
+                 .fillMaxWidth()
+                 .padding(vertical = 12.dp)
+         ) {
+             Text(
+                 text = "Trip:",
+                 modifier = Modifier.padding(start = 18.dp)
+             )
+             Spacer(modifier = Modifier.height(8.dp))
+             Row(verticalAlignment = Alignment.CenterVertically) {
+                 Box(
+                     contentAlignment = Alignment.CenterStart,
+                     modifier = Modifier
+                         .weight(1f)
+                         .clip(RoundedCornerShape(4.dp))
+                         .background(Color.White)
+                         .clickable(onClick = { expanded = true })
+                         .padding(horizontal = 18.dp, vertical = 8.dp)
+                         .border(
+                             width = 1.dp,
+                             color = Color.Gray,
+                             shape = RoundedCornerShape(8.dp)
+                         )
+                         .padding(
+                             horizontal = 12.dp,
+                             vertical = 8.dp
+                         )
+                 ) {
+                     Row(verticalAlignment = Alignment.CenterVertically) {
+                         Text(selectedTrip, modifier = Modifier.weight(1f))
+                         Icon(
+                             imageVector = Icons.Default.ArrowDropDown,
+                             contentDescription = "Dropdown",
+                             modifier = Modifier
+                                 .size(24.dp)
+                                 .align(Alignment.CenterVertically)
+                         )
+                     }
+                 }
+                 Button(
+                     onClick = { showAddTripCallback() },
+                     shape = RoundedCornerShape(4.dp),
+                     modifier = Modifier
+                         .padding(end = 18.dp)
+                 ) {
+                     Icon(
+                         imageVector = Icons.Filled.Add,
+                         contentDescription = null,
+                     )
+                 }
+             }
+             DropdownMenu(
+                 expanded = expanded,
+                 onDismissRequest = { expanded = false },
+                 modifier = Modifier.fillMaxWidth(),
+             ) {
+                 trips.forEach { trip ->
+                     DropdownMenuItem(
+                         modifier = Modifier
+                             .padding(start = 48.dp, end = 136.dp)
+                             .background(Color.White),
+                         text = { Text(trip.title) },
+                         onClick = {
+                             onValueChange(trip.tripId!!)
+                             expanded = false
+                         }
+                     )
+                 }
+             }
+         }
+     }
+ }
+
+ @Composable
 fun TagEntry(tags: MutableList<String>) {
     var newTag by remember { mutableStateOf("") }
 

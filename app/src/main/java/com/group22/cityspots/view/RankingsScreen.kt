@@ -1,6 +1,7 @@
 package com.group22.cityspots.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,8 +16,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -50,6 +54,7 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
     )
     val entries by rankingScreenViewModel.entriesLiveData.observeAsState()
     val tags = rankingScreenViewModel.tags.observeAsState()
+    var expanded by remember { mutableStateOf(false) }
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
@@ -62,6 +67,36 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                 )
                 .padding(horizontal = 20.dp)
         ) {
+            Spacer(modifier = Modifier.height(20.dp))
+
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier
+                        .height(40.dp)
+                        .weight(1f)
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable(onClick = { expanded = true })
+                        .border(
+                            width = 1.dp,
+                            color = Color.Gray,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Hello", modifier = Modifier.weight(1f))
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = "Dropdown",
+                            modifier = Modifier
+                                .size(24.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(20.dp))
             TagEditorFragment(
                 tags = tags,

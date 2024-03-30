@@ -8,6 +8,7 @@ data class Entry(
     val tags: List<String> = emptyList(),
     val geoLocation: GeoLocation = GeoLocation(0.0, 0.0),
     val rating: Double = 0.0,
-    val userId: String = ""
+    val userId: String = "",
+    val tripId: String = ""
 )
 
