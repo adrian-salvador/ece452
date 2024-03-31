@@ -4,7 +4,6 @@ package com.group22.cityspots
 
 import LoginScreen
 import android.content.Intent
-import android.net.Uri
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -42,9 +41,9 @@ import androidx.navigation.navArgument
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.libraries.places.api.Places
 import com.group22.cityspots.model.GoogleAuthUIClient
-import com.group22.cityspots.ui.theme.CityHangoutsTheme
 import com.group22.cityspots.view.AddEntryScreen
 import com.group22.cityspots.view.EntryScreen
+import com.group22.cityspots.view.FriendRankingScreen
 import com.group22.cityspots.view.FriendsScreen
 import com.group22.cityspots.view.HomeScreen
 import com.group22.cityspots.view.ProfileScreen
@@ -177,8 +176,18 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("addEntry") { AddEntryScreen(navController, userViewModel, mapViewModel) }
                         composable("friends") { FriendsScreen(navController, userViewModel) }
+                        composable(
+                            route = "friendsRanking/{userId}/{userName}",
+                            arguments = listOf(
+                                navArgument("userId") { type = NavType.StringType },
+                                navArgument("userName") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            FriendRankingScreen(navController, backStackEntry, userViewModel)
+                        }
                         composable("userProfile") {
                             ProfileScreen(
+                                navController,
                                 userLoginData = googleAuthUIClient.getSignedInUser(),
                                 onSignOut = {
                                     lifecycleScope.launch {
