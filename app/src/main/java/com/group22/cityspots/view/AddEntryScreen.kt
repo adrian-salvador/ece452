@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,6 +33,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -69,6 +72,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
@@ -115,13 +119,8 @@ fun AddEntryScreen(
     var showRatingPopup by remember { mutableStateOf(false) }
     var showAddTrip by remember { mutableStateOf(false) }
     val showAddTripCallback: () -> Unit = { showAddTrip = true }
-    val imageUris = remember { mutableStateListOf<Uri>() }
-    val pickImagesLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            uri?.let { imageUris.add(it) }
-        }
-    )
+
+    val imageUrls by addEntryViewModel.imageUrls.observeAsState()
 
     fun refreshTrips() {
         tripViewModel.refreshTrips()
@@ -209,14 +208,52 @@ fun AddEntryScreen(
                     .horizontalScroll(rememberScrollState())
                     .padding(top = 10.dp)
             ) {
-                imageUris.forEach { uri ->
-                    CroppedSquareImage(uri)
+                imageUrls?.forEach { imageUrl ->
+                    Box(
+                        modifier = Modifier.height(100.dp)
+                            .width(80.dp)
+                    ){
+                        CroppedSquareImage(imageUrl)
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(24.dp)
+                                .background(
+                                    color = Color.White,
+                                    shape = CircleShape
+                                )
+                                .padding(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Delete",
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .size(20.dp)
+                                    .clickable {
+                                        addEntryViewModel.deleteImage(
+                                            imageUrl,
+                                            context
+                                        )
+                                    }
+                                    .padding(4.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            val imagePickerLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.GetContent()
+            ) { uri: Uri? ->
+                uri?.let {
+                    addEntryViewModel.uploadImage(context, it, "userId") // Use the actual userId
                 }
             }
 
             //Upload Image Button
             Button(
-                onClick = { pickImagesLauncher.launch("image/*") },
+                onClick = { imagePickerLauncher.launch("image/*") },
                 modifier = Modifier.padding(top = 10.dp)
             ) {
                 Text("Upload Images")
@@ -245,7 +282,7 @@ fun AddEntryScreen(
                             userId = user!!.userId
                         )
 
-                        addEntryViewModel.uploadImagesAndCreateEntry(imageUris, entryDetails, context)
+                        addEntryViewModel.createEntry( entryDetails, context )
                         navController.popBackStack()
                     }else {
                         Toast.makeText(context, "Please add an Activity Name", Toast.LENGTH_LONG).show()
@@ -304,21 +341,16 @@ fun AddEntryScreen(
 }
 
  @Composable
-fun CroppedSquareImage(imageUri: Uri) {
-    val painter = rememberAsyncImagePainter(
-        ImageRequest.Builder(LocalContext.current).data(data = imageUri)
-            .apply<ImageRequest.Builder>(block = fun ImageRequest.Builder.() {
-                transformations(CircleCropTransformation())
-            }).build()
-    )
-    Image(
-        painter = painter,
-        contentDescription = "Cropped Image",
-        modifier = Modifier
-            .size(100.dp)
-            .clip(RoundedCornerShape(4.dp)),
-        contentScale = ContentScale.Crop
-    )
+fun CroppedSquareImage(imageUrl: String) {
+     AsyncImage(
+         model = imageUrl,
+         contentDescription = "Image of entry",
+         modifier = Modifier
+             .clip(RoundedCornerShape(8.dp))
+             .fillMaxWidth()
+             .fillMaxHeight(),
+         contentScale = ContentScale.Crop
+     )
 }
 
 @Composable

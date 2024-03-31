@@ -1,5 +1,6 @@
 package com.group22.cityspots.viewmodel
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
@@ -17,6 +18,7 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
     val ratingLiveData = MutableLiveData<Double>()
     val entriesLiveData = MutableLiveData<List<Entry>>()
     val editEntry = MutableLiveData<Entry>()
+    val imageUrls = MutableLiveData<List<String>>(listOf())
     val tags = MutableLiveData<List<String>>()
 
     init {
@@ -79,19 +81,45 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
         return Pair(previousEntryIndex, nextEntryIndex)
     }
 
-    fun uploadImagesAndCreateEntry(images: List<Uri>, entryDetails: Entry, context: Context) {
+    fun uploadImage(context: Context, imageUri: Uri, userId: String) {
         viewModelScope.launch {
-            val imageUrls = images.map { uri ->
-                async {
-                    val imageData = uri.toBytes(context)
-                    Firestore().uploadPicture(imageData, userId, context)
-                }
-            }.awaitAll()
+            uploadImageAndGetUrl(imageUri, context, userId, imageUrls)
+        }
+    }
+    @SuppressLint("Recycle")
+    suspend fun uploadImageAndGetUrl(imageUri: Uri, context: Context, userId: String, imageUrls: MutableLiveData<List<String>>) {
+        val imageData = context.contentResolver.openInputStream(imageUri)?.readBytes()
+            ?: throw IllegalArgumentException("Unable to convert Uri to bytes")
 
+        val imageUrl = Firestore().uploadPicture(imageData, userId, context)
+
+        imageUrl?.let { nonNullImageUrl ->
+            val currentList = imageUrls.value ?: emptyList()
+            val updatedList = currentList + nonNullImageUrl
+            imageUrls.postValue(updatedList)
+        }
+    }
+
+    fun deleteImage(imagePath: String, context: Context) {
+        viewModelScope.launch {
+            val success = Firestore().deletePicture(imagePath, context)
+
+            if (success) {
+                val currentList = imageUrls.value ?: listOf()
+                val updatedList = currentList.toMutableList().apply {
+                    remove(imagePath)
+                }
+                imageUrls.postValue(updatedList)
+            }
+        }
+    }
+
+    fun createEntry( entryDetails: Entry, context: Context) {
+        viewModelScope.launch {
             val newEntry = Entry(
                 entryId = entryDetails.entryId,
                 title = entryDetails.title,
-                pictures = imageUrls.filterNotNull(),
+                pictures = imageUrls.value,
                 review = entryDetails.review,
                 tripId = entryDetails.tripId,
                 tags = entryDetails.tags,
