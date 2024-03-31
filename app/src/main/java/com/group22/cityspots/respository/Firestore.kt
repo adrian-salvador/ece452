@@ -128,6 +128,22 @@ class Firestore {
             null
         }
     }
+
+    suspend fun deletePicture(imageUrl: String, context: Context): Boolean {
+        val storageRef = Firebase.storage.reference
+
+        return try {
+            val imageRef = storageRef.storage.getReferenceFromUrl(imageUrl)
+            imageRef.delete().await()
+            true
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+
+                Toast.makeText(context, "Deletion Failed: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+            false
+        }
+    }
 }
 
 

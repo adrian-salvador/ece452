@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,8 +52,10 @@ fun EntryCardFragment(navController: NavController?, entry: Entry, index:Int?, h
                 contentDescription = "Image of entry",
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .clip(RoundedCornerShape(20.dp)),
-                contentScale = ContentScale.FillBounds
+                    .clip(RoundedCornerShape(20.dp))
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                contentScale = ContentScale.Crop
             )
         } else {
             Icon(
