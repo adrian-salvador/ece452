@@ -29,9 +29,14 @@
 | 2024/03/28 |        |         |        |          | 6     |       | Bug fixing for the Google Places / Maps not bringing the view to the correct location                     |
 | 2024/03/29 |        |         |        |          | 3     |       | Polished the Google Maps / Places integration                                                             |
 | 2024/03/28 |        |         |        |          |       | 5     | Designed and implmented the Trip class in the app and database                                            |
-| 2024/03/28 |        |         |        |          |       | 5     | Debugging android studio emulator                                                                         |
+| 2024/03/28 |        |         |        |          |       | 5     | Debugging android studio emulator
+| 2024/03/28 |        |         |        |    3     |       |       | work on deliverbale 5                                                                                     |
 | 2024/03/29 |        |         |        |          |       | 5     | Implemented the tripviewmodel to get all trips for a selected user, select trip when adding an entry, view trip when viewing an entry|
 | 2024/03/29 |        |         |        |          | 2     |       | deliverbale 5                                                                                             |
 | 2024/03/29 |        |         |        |          | 3     |       | helped with home page city filter integration                                                             | 
-| 2024/03/29 |        |         |        |          |       | 5     | Add new trips                                                                         |
-| 2024/03/30 |        |         |        |          |       | 5     | Filter entries based on trips                                                                         |
+| 2024/03/29 |        |         |        |          |       | 5     | Add new trips                                                                                             |
+| 2024/03/29 |        |         |        |          |       |       | Filter entries based on trips                                                                             |
+| 2024/03/29 |        |         |        |    3     |       |       | Add friend page with minor UI                                                                             |
+| 2024/03/30 |        |         | 7      |          |       |       | Redo all dropdown UI and fix scaling and interpolation on ranking selection popup                         |
+| 2024/03/30 |        |         |        |    10    |       |       | Add backend functionality for friend page with firebase, including sending and recieving requests + UI    |
+| 2024/03/31 |        |         |        |    8     |       |       | Improve realtime update of friend page, add viewing friend's rankings and entries + improve UI            |

@@ -1,4 +1,4 @@
- package com.group22.cityspots.view
+package com.group22.cityspots.view
 
 import android.net.Uri
 import android.util.Log
@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,6 +33,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -67,7 +70,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
@@ -83,43 +88,68 @@ import com.group22.cityspots.viewmodel.TripViewModelFactory
 import okhttp3.internal.wait
 
 
- @Composable
-fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, mapViewModel: MapViewModel) {
+@Composable
+fun AddEntryScreen(
+    navController: NavController,
+    navBackStackEntry: NavBackStackEntry,
+    userViewModel: UserViewModel,
+    mapViewModel: MapViewModel
+) {
     val user by userViewModel.userLiveData.observeAsState()
+
     var entryName by remember { mutableStateOf("") }
     var hasTitle by remember { mutableStateOf(false) }
     var description by remember { mutableStateOf("") }
     var tripId by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("")}
     val tripViewModel: TripViewModel = viewModel(
         factory = TripViewModelFactory(user!!.userId)
     )
     val trips by tripViewModel.tripsLiveData.observeAsState()
+    val entryId = navBackStackEntry.arguments?.getString("entryId")
     val addEntryViewModel: AddEntryViewModel = viewModel(
         factory = AddEntryViewModelFactory(user!!.userId)
     )
+
+    val editEntry by addEntryViewModel.editEntry.observeAsState()
+    val entries by addEntryViewModel.entriesLiveData.observeAsState()
     val tags = addEntryViewModel.tags.observeAsState(listOf())
+
     val rating by addEntryViewModel.ratingLiveData.observeAsState(0.00)
     var showRatingPopup by remember { mutableStateOf(false) }
     var showAddTrip by remember { mutableStateOf(false) }
     val showAddTripCallback: () -> Unit = { showAddTrip = true }
-    val imageUris = remember { mutableStateListOf<Uri>() }
-    val pickImagesLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            uri?.let { imageUris.add(it) }
-        }
-    )
+
+    val imageUrls by addEntryViewModel.imageUrls.observeAsState()
+
     fun refreshTrips() {
-        tripViewModel.refreshTrips() // This function should refresh the tripsLiveData in your ViewModel
+        tripViewModel.refreshTrips()
     }
 
     var displayMap by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    println("entires size: "+ entries?.size)
+    if (entries != null && editEntry == null){
+        println("Entry id: " + entryId)
+        if (entryId != null) {
+            val origEntry = addEntryViewModel.updateEditEntry(entryId)
+            entryName = origEntry.title
+            hasTitle = true
+            description = origEntry.review
+            addEntryViewModel.updateRating(origEntry.rating)
+            tripId = origEntry.tripId
+            addEntryViewModel.updateTags(origEntry.tags)
+            mapViewModel.updateLocation(origEntry.placeId, origEntry.address)
+            address = origEntry.address
+        }
+    }
 
-    Box(modifier = Modifier
-        .background(Color(0x2F84ABE4))
-        .padding(10.dp)
+
+    Box(
+        modifier = Modifier
+            .background(Color(0x2F84ABE4))
+            .padding(10.dp)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -178,14 +208,52 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
                     .horizontalScroll(rememberScrollState())
                     .padding(top = 10.dp)
             ) {
-                imageUris.forEach { uri ->
-                    CroppedSquareImage(uri)
+                imageUrls?.forEach { imageUrl ->
+                    Box(
+                        modifier = Modifier.height(100.dp)
+                            .width(80.dp)
+                    ){
+                        CroppedSquareImage(imageUrl)
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(24.dp)
+                                .background(
+                                    color = Color.White,
+                                    shape = CircleShape
+                                )
+                                .padding(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Delete",
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .size(20.dp)
+                                    .clickable {
+                                        addEntryViewModel.deleteImage(
+                                            imageUrl,
+                                            context
+                                        )
+                                    }
+                                    .padding(4.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            val imagePickerLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.GetContent()
+            ) { uri: Uri? ->
+                uri?.let {
+                    addEntryViewModel.uploadImage(context, it, "userId") // Use the actual userId
                 }
             }
 
             //Upload Image Button
             Button(
-                onClick = { pickImagesLauncher.launch("image/*") },
+                onClick = { imagePickerLauncher.launch("image/*") },
                 modifier = Modifier.padding(top = 10.dp)
             ) {
                 Text("Upload Images")
@@ -200,8 +268,9 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
             ) {
                 Button(onClick = {
                     if (hasTitle) {
+                        println(entryId)
                         val entryDetails = Entry(
-                            entryId = null,
+                            entryId = entryId,
                             title = entryName,
                             pictures = null,
                             review = description,
@@ -212,14 +281,19 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
                             rating = rating.toDouble(),
                             userId = user!!.userId
                         )
-                        addEntryViewModel.uploadImagesAndCreateEntry(imageUris, entryDetails, context )
 
+                        addEntryViewModel.createEntry( entryDetails, context )
                         navController.popBackStack()
                     }else {
                         Toast.makeText(context, "Please add an Activity Name", Toast.LENGTH_LONG).show()
                     }
                 }) {
-                    Text("Add Entry")
+                    if (entryId == null){
+                        Text("Add Entry")
+                    } else {
+                        Text("Update Entry")
+                    }
+
                 }
             }
         }
@@ -267,21 +341,16 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
 }
 
  @Composable
-fun CroppedSquareImage(imageUri: Uri) {
-    val painter = rememberAsyncImagePainter(
-        ImageRequest.Builder(LocalContext.current).data(data = imageUri)
-            .apply<ImageRequest.Builder>(block = fun ImageRequest.Builder.() {
-                transformations(CircleCropTransformation())
-            }).build()
-    )
-    Image(
-        painter = painter,
-        contentDescription = "Cropped Image",
-        modifier = Modifier
-            .size(100.dp)
-            .clip(RoundedCornerShape(4.dp)),
-        contentScale = ContentScale.Crop
-    )
+fun CroppedSquareImage(imageUrl: String) {
+     AsyncImage(
+         model = imageUrl,
+         contentDescription = "Image of entry",
+         modifier = Modifier
+             .clip(RoundedCornerShape(8.dp))
+             .fillMaxWidth()
+             .fillMaxHeight(),
+         contentScale = ContentScale.Crop
+     )
 }
 
 @Composable
@@ -333,11 +402,12 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
  @Composable
  fun TripEntry(trips: List<Trip>, tripId: String, userId: String, showAddTripCallback: () -> Unit, onValueChange: (String) -> Unit) {
      var expanded by remember { mutableStateOf(false) }
-     var selectedTrip by remember { mutableStateOf("") }
+     var selectedTrip by remember { mutableStateOf(tripId) }
      var triggerRowWidth by remember { mutableIntStateOf(0) }
      trips.forEach { trip ->
          if (trip.tripId == tripId) {
              selectedTrip = trip.title
+             println("Selected Trip Is : " + selectedTrip)
              return@forEach
          }
      }
@@ -416,7 +486,7 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
                          onDismissRequest = { expanded = false },
                          modifier = Modifier
                              .background(Color.White)
-                             .width(with(LocalDensity.current) { triggerRowWidth.toDp() - 36.dp})
+                             .width(with(LocalDensity.current) { triggerRowWidth.toDp() - 36.dp })
                      ) {
                          trips.forEach { trip ->
                              DropdownMenuItem(
