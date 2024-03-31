@@ -13,6 +13,7 @@ class UserViewModel(private val defaultUser: User) : ViewModel() {
     private val firestore = Firestore()
     val userLiveData = MutableLiveData<User>()
     val citiesLiveData = MutableLiveData<List<String>>()
+    val lastSelectedCity = MutableLiveData<String>()
 
     init {
         userLiveData.value = defaultUser
@@ -42,6 +43,10 @@ class UserViewModel(private val defaultUser: User) : ViewModel() {
             firestore.updateUser(userLiveData.value!!, context)
             citiesLiveData.postValue(userLiveData.value!!.cities)
         }
+    }
+
+    fun updateLastSelectedCity(city: String) {
+        lastSelectedCity.postValue(city)
     }
 
     fun removeUserCity(city: String, context: Context) {

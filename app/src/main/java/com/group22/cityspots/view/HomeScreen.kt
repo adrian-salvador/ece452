@@ -55,15 +55,20 @@ import com.group22.cityspots.viewmodel.UserViewModel
 fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapViewModel: MapViewModel) {
     // edit to grab cities from firebase
     val user by userViewModel.userLiveData.observeAsState()
-
-    val cities by userViewModel.citiesLiveData.observeAsState(mutableListOf())
-    var selectedCity by remember { mutableStateOf("No City Selected") }
-
-    var addCityModalVisible by remember { mutableStateOf(false)}
-
     val entryScreenViewModel: EntryViewModel = viewModel(
         factory = EntryViewModelFactory(user!!)
     )
+
+    val cities by userViewModel.citiesLiveData.observeAsState(mutableListOf())
+    var selectedCity by remember { mutableStateOf(
+        if (userViewModel.lastSelectedCity.value?.isNotEmpty() == true) {
+            entryScreenViewModel.loadCityEntries(userViewModel.lastSelectedCity.value!!)
+            userViewModel.lastSelectedCity.value!!
+        }
+        else "No City Selected"
+    ) }
+
+    var addCityModalVisible by remember { mutableStateOf(false)}
 
     // entries within the same city
     val entries by entryScreenViewModel.cityEntriesLiveData.observeAsState()
@@ -123,10 +128,12 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
         addCityModalVisible = false
         userViewModel.addUserCity(it, currentContext)
         selectedCity = it
+        userViewModel.updateLastSelectedCity(it)
     }
 
     if (selectedCity == "No City Selected" && cities.isNotEmpty()){
         selectedCity = cities[0]
+        userViewModel.updateLastSelectedCity(selectedCity)
         entryScreenViewModel.loadCityEntries(selectedCity)
     }
 
@@ -179,6 +186,7 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                                     text = { Text(city) },
                                     onClick = {
                                         selectedCity = city
+                                        userViewModel.updateLastSelectedCity(selectedCity)
                                         entryScreenViewModel.loadCityEntries(selectedCity)
                                         expanded = false
                                     }
@@ -219,7 +227,9 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                         Button(
                             onClick = {
                             userViewModel.removeUserCity(selectedCity, currentContext)
-                            selectedCity = if (cities.isNotEmpty()) cities[0] else "No City Selected" }
+                            selectedCity = if (cities.isNotEmpty()) cities[0] else "No City Selected"
+                            userViewModel.updateLastSelectedCity(selectedCity)
+                            }
                         ) {
                             Text("Delete City")
                         }
