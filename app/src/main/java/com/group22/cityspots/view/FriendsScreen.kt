@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Button
@@ -97,6 +98,7 @@ fun FriendsScreen(navController: NavController, userViewModel: UserViewModel) {
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
+                    Spacer(modifier = Modifier.width(25.dp))
                     Button(
                         onClick = { showFriends = false },
                         modifier = Modifier.weight(1f),
@@ -208,7 +210,7 @@ fun RenderFriends(friends: List<User>?, navController: NavController) {
                     Box(
                         contentAlignment = Alignment.BottomCenter,
                         modifier = Modifier
-                            .height(250.dp)
+                            .height(150.dp)
                             .clip(RoundedCornerShape(20.dp))
                             .background(Color(0xffd5d4d7))
                             .clickable {
@@ -221,14 +223,14 @@ fun RenderFriends(friends: List<User>?, navController: NavController) {
                                 contentDescription = "Profile Picture",
                                 modifier = Modifier
                                     .align(Alignment.Center)
-                                    .clip(RoundedCornerShape(20.dp)),
+                                    .size(150.dp),
                                 contentScale = ContentScale.FillBounds
                             )
                         } else {
                             Icon(
                                 Icons.Filled.Person,
                                 contentDescription = "No image available",
-                                modifier = Modifier.size(50.dp),
+                                modifier = Modifier.size(150.dp),
                                 tint = Color.Gray
                             )
                         }
@@ -239,7 +241,7 @@ fun RenderFriends(friends: List<User>?, navController: NavController) {
                                 color = Color.White,
                                 modifier = Modifier
                                     .background(
-                                        Color.Black.copy(alpha = 0.5f),
+                                        Color.Gray.copy(alpha = 0.5f),
 //                                        RoundedCornerShape(15.dp)
                                     )
                                     .padding(horizontal = 10.dp, vertical = 2.dp),
@@ -296,7 +298,7 @@ fun RenderRequests(user: User, friendUser: Friends, friendsViewModel: FriendsVie
             ) {
                 Text(text = req)
                 IconButton(onClick = { friendsViewModel.modFriendReq(req,user, "accept", context) }) {
-                    Icon(Icons.Rounded.CheckCircle, contentDescription = "Accept")
+                    Icon(Icons.Default.Check, contentDescription = "Accept")
                 }
                 IconButton(onClick = { friendsViewModel.modFriendReq(req,user, "decline", context) }) {
                     Icon(Icons.Rounded.Close, contentDescription = "Decline")
@@ -314,12 +316,12 @@ fun AddFriendPopup(user: User, friendsViewModel: FriendsViewModel, onClose: () -
 
     Box(
         modifier = Modifier
-            .padding(10.dp)
+            .padding(2.dp)
             .background(Color.White),
     ) {
         Column(
             modifier = Modifier
-                .padding(18.dp)
+                .padding(2.dp)
                 .fillMaxWidth()
         ) {
 
@@ -344,9 +346,9 @@ fun AddFriendPopup(user: User, friendsViewModel: FriendsViewModel, onClose: () -
                         Toast.makeText(context, "Please add email", Toast.LENGTH_LONG).show()
                     }
                 },
-                modifier = Modifier.align(Alignment.Start)
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text("Add Friend")
+                Text("Send Request")
             }
         }
     }
