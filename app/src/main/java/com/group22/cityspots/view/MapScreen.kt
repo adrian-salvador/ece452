@@ -155,7 +155,8 @@ fun MapScreen(
                 modifier = Modifier
                     .padding(bottom = 10.dp)
                     .align(Alignment.BottomCenter),
-                contentPadding = PaddingValues(6.dp)
+                contentPadding = PaddingValues(6.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp)
             ) {
                 Icon(Icons.Filled.Check, "Save Location")
             }
