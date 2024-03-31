@@ -32,8 +32,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -72,6 +74,7 @@ import coil.compose.AsyncImage
 import com.google.android.gms.maps.model.LatLng
 import com.group22.cityspots.model.Entry
 import com.group22.cityspots.model.Trip
+import com.group22.cityspots.respository.Firestore
 import com.group22.cityspots.viewmodel.AddEntryViewModel
 import com.group22.cityspots.viewmodel.AddEntryViewModelFactory
 import com.group22.cityspots.viewmodel.MapViewModel
@@ -93,6 +96,8 @@ fun AddEntryScreen(
     var hasTitle by remember { mutableStateOf(false) }
     var description by remember { mutableStateOf("") }
     var tripId by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("")}
+    var showDialog by remember { mutableStateOf(false) }
     val tripViewModel: TripViewModel = viewModel(
         factory = TripViewModelFactory(user!!.userId)
     )
@@ -196,11 +201,13 @@ fun AddEntryScreen(
             Row(
                 modifier = Modifier
                     .horizontalScroll(rememberScrollState())
-                    .padding(top = 10.dp)
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 imageUrls?.forEach { imageUrl ->
                     Box(
-                        modifier = Modifier.height(100.dp)
+                        modifier = Modifier
+                            .height(100.dp)
                             .width(80.dp)
                     ){
                         CroppedSquareImage(imageUrl)
@@ -256,7 +263,9 @@ fun AddEntryScreen(
                     .fillMaxWidth()
                     .padding(top = 30.dp)
             ) {
-                Button(onClick = {
+                Button(
+                    modifier = Modifier.align(Alignment.Center),
+                    onClick = {
                     if (hasTitle) {
                         println(entryId)
                         val entryDetails = Entry(
@@ -287,6 +296,39 @@ fun AddEntryScreen(
                         Text("Update Entry")
                     }
 
+                }
+
+                if ( entryId != null ){
+                    Button(
+                        onClick = { showDialog = true },
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        Icon(Icons.Filled.Delete, contentDescription = "Delete Button")
+                    }
+
+                    if (showDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showDialog = false },
+                            title = { Text("Delete Entry") },
+                            text = { Text("Are you sure you want to delete this entry?") },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        Firestore().deleteEntry(entryId, context)
+                                        navController.popBackStack()
+                                        showDialog = false
+                                    }
+                                ) {
+                                    Text("Yes")
+                                }
+                            },
+                            dismissButton = {
+                                Button(onClick = { showDialog = false }) {
+                                    Text("No")
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }

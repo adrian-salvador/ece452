@@ -19,7 +19,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class Firestore {
-    private val entriesCollectionRef = Firebase.firestore.collection("entries")
+    val entriesCollectionRef = Firebase.firestore.collection("entries")
     private val usersCollectionRef = Firebase.firestore.collection("users")
     private val tripsCollectionRef = Firebase.firestore.collection("trips")
     private val friendsCollectionRef = Firebase.firestore.collection("friends")
@@ -104,9 +104,9 @@ class Firestore {
     }
 
 
-    fun deleteEntry(entry: Entry, context: Context) = CoroutineScope(Dispatchers.IO).launch {
+    fun deleteEntry(entryId: String, context: Context) = CoroutineScope(Dispatchers.IO).launch {
         try {
-            entriesCollectionRef.document(entry.entryId!!)
+            entriesCollectionRef.document(entryId)
                 .delete()
                 .addOnSuccessListener {
                     Toast.makeText(context, "Successfully Deleted Entry", Toast.LENGTH_LONG).show()
@@ -232,6 +232,28 @@ class Firestore {
             emptyList<Entry>()
         }
     }
+
+    suspend fun getEntriesByPlaceId(placeId: String): List<Entry> = withContext(Dispatchers.IO) {
+        try {
+            println("Place Id $placeId")
+            val querySnapshot = entriesCollectionRef
+                .whereEqualTo("placeId", placeId)
+                .orderBy("rating", Query.Direction.DESCENDING)
+                .get().await()
+
+            val list = querySnapshot.documents.mapNotNull { document ->
+                document.toObject(Entry::class.java)
+            }
+
+            println("Query Data $list")
+            return@withContext list
+
+        } catch (e: Exception) {
+            println("Error fetching entries by placeId $e")
+            emptyList<Entry>()
+        }
+    }
+
 
     suspend fun getEntryByEntryId(entryId: String): Entry? = withContext(Dispatchers.IO) {
         try {

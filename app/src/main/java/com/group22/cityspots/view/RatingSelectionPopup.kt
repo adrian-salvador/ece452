@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -101,12 +102,12 @@ fun RatingSelectionPopup(addEntryViewModel: AddEntryViewModel, onClose: () -> Un
     }
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().background(Color(0x6F84ABE4))
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White, shape = RoundedCornerShape(8.dp)),
+                .fillMaxSize(),
+                //.background(Color.White, shape = RoundedCornerShape(8.dp)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -125,7 +126,7 @@ fun RatingSelectionPopup(addEntryViewModel: AddEntryViewModel, onClose: () -> Un
                             modifier = Modifier.size(30.dp),
                             tint = Color(0xfff8d675)
                         )
-                        Text(String.format("%.2f", rating), fontSize = 30.sp, modifier = Modifier.width(80.dp))
+                        Text(String.format("%.2f", rating), fontSize = 30.sp, modifier = Modifier.width(80.dp), color = Color.White)
 
                     }
                     Icon(
@@ -173,7 +174,11 @@ fun RatingSelectionPopup(addEntryViewModel: AddEntryViewModel, onClose: () -> Un
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(onClick = onClose) {
-                    Text("Done")
+                    Icon(
+                        imageVector = Icons.Filled.Check,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
