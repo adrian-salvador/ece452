@@ -139,21 +139,15 @@ fun AddEntryScreen(
     if (entries != null && editEntry == null){
         println("Entry id: " + entryId)
         if (entryId != null) {
-            // this means we are in an edit
-            //addEntryViewModel.updateEditEntry(entryId) CHECK IF NEEDED
-            entryName = currentEntry!!.title
+            val origEntry = addEntryViewModel.updateEditEntry(entryId)
+            entryName = origEntry.title
             hasTitle = true
-            description = currentEntry.review
-            //rating = currentEntry.rating
-            //println("Current Entry Rating: " + currentEntry.rating)
-            tripId = currentEntry.tripId
-            //tags = currentEntry.tags
-            //placeId = currentEntry.currentPlaceId
-            address = currentEntry.address
-
-
-            //pictures = null,
-            //tags = tags.value,
+            description = origEntry.review
+            addEntryViewModel.updateRating(origEntry.rating)
+            tripId = origEntry.tripId
+            addEntryViewModel.updateTags(origEntry.tags)
+            mapViewModel.updateLocation(origEntry.placeId, origEntry.address)
+            address = origEntry.address
         }
     }
 
@@ -255,7 +249,7 @@ fun AddEntryScreen(
                                 rating = rating.toDouble(),
                                 userId = user!!.userId
                             )
-                            addEntryViewModel.updateEditEntry(entryId, entryDetails)
+                            addEntryViewModel.updateEditEntry(entryId)
                         }
                         else {
                             val entryDetails = Entry(
@@ -365,15 +359,14 @@ fun LocationNameEntry(entryName: String, hasTitle: Boolean, modifier: Modifier, 
 
 @Composable
 fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
-    var descriptionvalue by remember { mutableStateOf(description) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 15.dp, bottom = 12.dp)
     ) {
         TextField(
-            value = descriptionvalue,
-            onValueChange = { descriptionvalue = it },
+            value = description,
+            onValueChange = onValueChange,
             placeholder = { Text("Description") },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.White,

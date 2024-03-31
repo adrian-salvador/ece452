@@ -28,18 +28,11 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
         ratingLiveData.value = newRating
     }
 
-    fun updateEditEntry(entryId: String, entryDetails: Entry) {
+    fun updateEditEntry(entryId: String):Entry {
         val newEditEntry = entriesLiveData.value?.find { entry -> entry.entryId == entryId }
-        val newEntry = entriesLiveData.value?.map{entry ->
-            if (entry.entryId == entryId){
-                entryDetails
-            }
-            else{
-                entry
-            }
-        }
-        print("Updating" + newEntry)
+        print("Updating" + newEditEntry)
         editEntry.postValue(newEditEntry!!)
+        return newEditEntry
     }
 
     fun addTag(tag: String) {
@@ -56,6 +49,10 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
             val updatedTags = currentTags.toMutableList().apply { remove(tag) }
             tags.postValue(updatedTags)
         }
+    }
+
+    fun updateTags(newTags:List<String>){
+        tags.postValue(newTags)
     }
 
     private fun loadEntries() {
@@ -105,6 +102,32 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
             )
 
             Firestore().saveEntry(newEntry, context)
+        }
+    }
+
+    fun uploadImagesAndUpdateEntry(images: List<Uri>, entryDetails: Entry, context: Context) {
+        viewModelScope.launch {
+            val imageUrls = images.map { uri ->
+                async {
+                    val imageData = uri.toBytes(context)
+                    Firestore().uploadPicture(imageData, userId, context)
+                }
+            }.awaitAll()
+
+            val newEntry = Entry(
+                entryId = entryDetails.entryId,
+                title = entryDetails.title,
+                pictures = imageUrls.filterNotNull(),
+                review = entryDetails.review,
+                tripId = entryDetails.tripId,
+                tags = entryDetails.tags,
+                placeId = entryDetails.placeId,
+                address = entryDetails.address,
+                rating = ratingLiveData.value ?: 0.0,
+                userId = userId
+            )
+
+            Firestore().updateEntry(newEntry, context)
         }
     }
 
