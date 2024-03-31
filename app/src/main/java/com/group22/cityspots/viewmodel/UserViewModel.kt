@@ -43,6 +43,15 @@ class UserViewModel(private val defaultUser: User) : ViewModel() {
             citiesLiveData.postValue(userLiveData.value!!.cities)
         }
     }
+
+    fun removeUserCity(city: String, context: Context) {
+        userLiveData.value!!.cities.remove(city)
+
+        viewModelScope.launch {
+            firestore.updateUser(userLiveData.value!!, context)
+            citiesLiveData.postValue(userLiveData.value!!.cities)
+        }
+    }
 }
 
 class UserViewModelFactory(private val defaultUser: User) : ViewModelProvider.Factory {

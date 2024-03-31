@@ -212,6 +212,19 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                         Text("Go to Ranking")
                     }
 
+                    if (selectedCity != "No City Selected") {
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        // Button to delete city
+                        Button(
+                            onClick = {
+                            userViewModel.removeUserCity(selectedCity, currentContext)
+                            selectedCity = if (cities.isNotEmpty()) cities[0] else "No City Selected" }
+                        ) {
+                            Text("Delete City")
+                        }
+                    }
+
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
