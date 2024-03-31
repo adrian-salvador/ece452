@@ -33,5 +33,6 @@
 | 2024/03/29 |        |         |        |          |       | 5     | Implemented the tripviewmodel to get all trips for a selected user, select trip when adding an entry, view trip when viewing an entry|
 | 2024/03/29 |        |         |        |          | 2     |       | deliverbale 5                                                                                             |
 | 2024/03/29 |        |         |        |          | 3     |       | helped with home page city filter integration                                                             | 
-| 2024/03/29 |        |         |        |          |       | 5     | Add new trips                                                                         |
-| 2024/03/30 |        |         |        |          |       | 5     | Filter entries based on trips                                                                         |
+| 2024/03/29 |        |         |        |          |       | 5     | Add new trips                                                                                             |
+| 2024/03/30 |        |         |        |          |       | 5     | Filter entries based on trips                                                                             |
+| 2024/03/30 |        |         | 7      |          |       |       | Redo all dropdown UI and fix scaling and interpolation on ranking selection popup                         |
