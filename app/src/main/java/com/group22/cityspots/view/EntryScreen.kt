@@ -172,7 +172,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                         modifier = Modifier
                             .padding(start = 20.dp)
                             .clickable {
-                               showMap = true
+                               if (entry.address.isNotEmpty()) showMap = true
                             },
                         color = Color(0xFFDBE8F9),
                         contentColor = Color(0xFF176FF2),
