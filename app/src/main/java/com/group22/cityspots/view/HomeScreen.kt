@@ -30,12 +30,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.group22.cityspots.model.Entry
 import com.group22.cityspots.viewmodel.EntryViewModel
 import com.group22.cityspots.viewmodel.EntryViewModelFactory
 import com.group22.cityspots.viewmodel.MapViewModel
@@ -68,6 +67,53 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
 
     // entries within the same city
     val entries by entryScreenViewModel.cityEntriesLiveData.observeAsState()
+    var entriesToDisplay by remember{ mutableStateOf(emptyList<Entry>()) }
+
+    if (entries != null) {
+        entriesToDisplay = entries as List<Entry>
+
+        // get and group all entries with the same placeId
+        val entriesGrouped = entriesToDisplay.groupBy { it.placeId }
+
+        // remove all entries within entriesGroup from entriesToDisplay
+        entriesToDisplay = entriesToDisplay.filter { it.placeId !in entriesGrouped.keys }
+
+        // create a new list to store entries to be added back
+        val entriesToAddToDisplay = mutableListOf<Entry>()
+
+        // iterate through each group and get the average rating + aggregate information
+        entriesGrouped.forEach { (_, entriesInGrouped) ->
+
+            val averageRating = entriesInGrouped.map { it.rating }.average()
+            val title = entriesInGrouped.first().title
+            val entryId = entriesInGrouped.first().entryId
+            val pictures = entriesInGrouped.map { it ->
+                it.pictures ?: emptyList()
+            }.flatten()
+            val reviews = entriesInGrouped.map { it.review }
+            val tags = entriesInGrouped.map { it.tags }.flatten()
+            val placeId = entriesInGrouped.first().placeId
+            val address = entriesInGrouped.first().address
+
+            // create a new entry with information above and store into entriesToAddToDisplay
+            entriesToAddToDisplay.add(Entry(
+                entryId = entryId,
+                title = title,
+                pictures = pictures,
+                review = reviews.joinToString(),
+                tags = tags,
+                placeId = placeId,
+                address = address,
+                rating = averageRating
+            ))
+        }
+
+        // add all entries in entriesToAddToDisplay back to entriesToDisplay
+        entriesToDisplay = entriesToDisplay + entriesToAddToDisplay
+
+        // sort entries to display by rating
+        entriesToDisplay = entriesToDisplay.sortedByDescending { it.rating }
+    }
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -87,7 +133,11 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             Column(modifier = Modifier
                 .padding(16.dp)
                 .align(Alignment.TopStart)) {
@@ -166,13 +216,12 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                Text(text = "Things in ${selectedCity.split(",").first().trim()}")
+                Text(text = "Places in ${selectedCity.split(",").first().trim()}")
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
                     Column(
@@ -182,8 +231,8 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                             .align(Alignment.Center)
                             .fillMaxWidth()
                     ) {
-                        if (entries?.isNotEmpty() == true) {
-                            entries?.forEach { entry ->
+                        if (entriesToDisplay.isNotEmpty()) {
+                            entriesToDisplay.forEach { entry ->
                                 EntryCardFragment(
                                     navController = navController,
                                     entry = entry,
@@ -191,16 +240,15 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                                     height = screenWidth - 60.dp,
                                     modifier = Modifier.width(screenWidth - 50.dp)
                                 )
+                                Spacer(modifier = Modifier.height(16.dp))
                             }
                         }
                     }
                 }
-
             }
-
-            if (addCityModalVisible) {
-                AddCityModal(viewModel = mapViewModel, onCloseClicked = onCloseClicked)
-            }
+        }
+        if (addCityModalVisible) {
+            AddCityModal(viewModel = mapViewModel, onCloseClicked = onCloseClicked)
         }
     }
 }
