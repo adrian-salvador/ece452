@@ -61,7 +61,7 @@ import com.group22.cityspots.viewmodel.UserViewModel
 fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEntry, userViewModel: UserViewModel) {
     val user by userViewModel.userLiveData.observeAsState()
     val rankingScreenViewModel: EntryViewModel = viewModel(
-        factory = EntryViewModelFactory(user!!.userId)
+        factory = EntryViewModelFactory(user!!)
     )
     val entryId = navBackStackEntry.arguments!!.getString("entryId")
     println(entryId)
@@ -151,7 +151,6 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
 
                         Spacer(Modifier.padding(end = 20.dp))
                     }
-
                     Row {
                         Box(
                             Modifier.padding(start = 20.dp)

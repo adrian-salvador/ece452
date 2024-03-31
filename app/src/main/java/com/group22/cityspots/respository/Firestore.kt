@@ -1,6 +1,7 @@
 package com.group22.cityspots.respository
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
@@ -39,6 +40,44 @@ class Firestore {
             }
         }
     }
+
+    fun updateUser(user: User, context: Context) = CoroutineScope(Dispatchers.IO).launch {
+        val updates = mutableMapOf<String, Any>()
+
+        val properties = User::class.java.declaredFields
+
+        for (property in properties) {
+            property.isAccessible = true
+
+            val propertyName = property.name
+            val propertyValue = property.get(user)
+
+            updates[propertyName] = propertyValue!!
+        }
+
+        try {
+            val querySnapshot = usersCollectionRef.whereEqualTo("userId", user.userId).get().await()
+
+            if (querySnapshot.documents.isEmpty()) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "No user to update", Toast.LENGTH_LONG).show()
+                }
+            } else {
+                for (documentSnapshot in querySnapshot.documents) {
+                    val documentId = documentSnapshot.id
+
+                    usersCollectionRef.document(documentId)
+                        .update(updates)
+                        .addOnFailureListener { e ->  Log.e("Error on Update", "Received error - $e")}
+                }
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
 
     fun saveEntry(entry: Entry, context: Context) = CoroutineScope(Dispatchers.IO).launch {
         try {
@@ -130,6 +169,48 @@ class Firestore {
         } catch (e: Exception) {
             println("Error fetching trips $e")
             emptyList<Trip>()
+        }
+    }
+
+    suspend fun getEntriesByAddress(address: String): List<Entry> = withContext(Dispatchers.IO) {
+        try {
+            println("Address: $address")
+            val querySnapshot = entriesCollectionRef
+                .whereEqualTo("address", address)
+                .get().await()
+
+            val list = querySnapshot.documents.mapNotNull { document ->
+                document.toObject(Entry::class.java)
+            }
+
+            println("Query Data $list")
+            return@withContext list
+
+        } catch (e: Exception) {
+            println("Error fetching entries $e")
+            emptyList<Entry>()
+        }
+    }
+
+    suspend fun getCitiesByUserId(userId: String): List<String> = withContext(Dispatchers.IO) {
+        try {
+            println("User ID: $userId")
+
+            val querySnapshot = usersCollectionRef
+                .whereEqualTo("userId", userId)
+                .get().await()
+
+            val list: List<String> = querySnapshot.documents.flatMap { document ->
+                val cities = document.get("cities") as? List<*>
+                cities?.filterIsInstance<String>() ?: emptyList()
+            }
+
+            println("Query Data $list")
+            return@withContext list
+
+        } catch (e: Exception) {
+            println("Error fetching cities - $e")
+            emptyList<String>()
         }
     }
 
