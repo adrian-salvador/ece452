@@ -39,6 +39,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.group22.cityspots.viewmodel.EntryViewModel
 import com.group22.cityspots.viewmodel.EntryViewModelFactory
+import com.group22.cityspots.viewmodel.RankingScreenViewModel
+import com.group22.cityspots.viewmodel.RankingScreenViewModelFactory
 import com.group22.cityspots.viewmodel.TripViewModel
 import com.group22.cityspots.viewmodel.TripViewModelFactory
 
@@ -46,8 +48,8 @@ import com.group22.cityspots.viewmodel.TripViewModelFactory
 fun FriendEntryScreen(navController: NavController, navBackStackEntry: NavBackStackEntry) {
     val userId = navBackStackEntry.arguments!!.getString("userId")
     val username = navBackStackEntry.arguments!!.getString("userName")
-    val rankingScreenViewModel: EntryViewModel = viewModel(
-        factory = EntryViewModelFactory(userId!!)
+    val rankingScreenViewModel: RankingScreenViewModel = viewModel(
+        factory = RankingScreenViewModelFactory(userId!!)
     )
     val entryId = navBackStackEntry.arguments!!.getString("entryId")
     println(entryId)
