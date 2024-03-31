@@ -151,7 +151,7 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            val chunkedEntries = entries?.chunked(2) ?: listOf()
+            val chunkedEntries = entries?.sortedByDescending{ it.rating }?.chunked(2) ?: listOf()
             chunkedEntries.forEachIndexed { rowIndex, rowEntries ->
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(20.dp),
