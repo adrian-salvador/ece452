@@ -34,3 +34,4 @@
 | 2024/03/29 |        |         |        |          | 2     |       | deliverbale 5                                                                                             |
 | 2024/03/29 |        |         |        |          | 3     |       | helped with home page city filter integration                                                             | 
 | 2024/03/29 |        |         |        |          |       | 5     | Add new trips                                                                         |
+| 2024/03/30 |        |         |        |          |       | 5     | Filter entries based on trips                                                                         |
