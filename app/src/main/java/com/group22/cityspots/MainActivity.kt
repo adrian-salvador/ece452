@@ -4,7 +4,6 @@ package com.group22.cityspots
 
 import LoginScreen
 import android.content.Intent
-import android.net.Uri
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -42,7 +41,6 @@ import androidx.navigation.navArgument
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.libraries.places.api.Places
 import com.group22.cityspots.model.GoogleAuthUIClient
-import com.group22.cityspots.ui.theme.CityHangoutsTheme
 import com.group22.cityspots.view.AddEntryScreen
 import com.group22.cityspots.view.EntryScreen
 import com.group22.cityspots.view.FriendsScreen
@@ -121,7 +119,7 @@ class MainActivity : ComponentActivity() {
                                     ).show()
                                     navController.navigate("home")
                                 } else if (state.signInError != null) {
-                                    showDialog = true;
+                                    showDialog = true
                                 }
                             }
                             LoginScreen(
@@ -130,7 +128,7 @@ class MainActivity : ComponentActivity() {
                                     lifecycleScope.launch {
                                         val signInIntent = googleAuthUIClient.signIn()
                                         if (signInIntent == null){
-                                            showDialog = true;
+                                            showDialog = true
                                         }
                                         launcher.launch(
                                             IntentSenderRequest.Builder(
@@ -167,7 +165,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
-                        composable("home") { HomeScreen(navController, userViewModel) }
+                        composable("home") { HomeScreen(navController, userViewModel, mapViewModel) }
                         composable("ranking") { RankingScreen(navController, userViewModel) }
                         composable(
                             route = "entry/{entryId}",

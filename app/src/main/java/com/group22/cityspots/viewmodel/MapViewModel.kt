@@ -12,9 +12,11 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.google.android.libraries.places.api.model.PlaceTypes
 import com.google.android.libraries.places.api.net.PlacesClient
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.util.Arrays
 
 data class AutocompleteResult(
     val address: String,
@@ -30,6 +32,32 @@ class MapViewModel(context: Context) : ViewModel() {
     var currentAddress by mutableStateOf("")
     private var job: Job? = null
 
+    fun searchCities(query: String) {
+        job?.cancel()
+        locationAutofill.clear()
+        job = viewModelScope.launch {
+            val request = FindAutocompletePredictionsRequest
+                .builder()
+                .setTypesFilter(Arrays.asList(PlaceTypes.CITIES))
+                .setQuery(query)
+                .build()
+            placesClient
+                .findAutocompletePredictions(request)
+                .addOnSuccessListener { response ->
+                    locationAutofill += response.autocompletePredictions.map {
+                        AutocompleteResult(
+                            it.getFullText(null).toString(),
+                            it.placeId
+                        )
+                    }
+                }
+                .addOnFailureListener {
+                    it.printStackTrace()
+                    println(it.cause)
+                    println(it.message)
+                }
+        }
+    }
     fun searchPlaces(query: String) {
         job?.cancel()
         locationAutofill.clear()

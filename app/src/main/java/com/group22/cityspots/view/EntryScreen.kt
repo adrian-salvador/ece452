@@ -1,6 +1,5 @@
 package com.group22.cityspots.view
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -47,7 +46,7 @@ import com.group22.cityspots.viewmodel.UserViewModel
 fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEntry, userViewModel: UserViewModel) {
     val user by userViewModel.userLiveData.observeAsState()
     val rankingScreenViewModel: EntryViewModel = viewModel(
-        factory = EntryViewModelFactory(user!!.userId)
+        factory = EntryViewModelFactory(user!!)
     )
     val entryId = navBackStackEntry.arguments!!.getString("entryId")
     println(entryId)
@@ -133,7 +132,6 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                         }
                         Spacer(Modifier.padding(end = 20.dp))
                     }
-
                     Row {
                         Box(
                             Modifier.padding(start = 20.dp)
