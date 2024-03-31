@@ -1,6 +1,5 @@
 package com.group22.cityspots.view
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,11 +33,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.group22.cityspots.respository.Firestore
 import com.group22.cityspots.viewmodel.EntryViewModel
 import com.group22.cityspots.viewmodel.EntryViewModelFactory
 import com.group22.cityspots.viewmodel.TripViewModel
@@ -64,6 +67,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
             return@forEach
         }
     }
+    val context = LocalContext.current
 
     Scaffold (
         bottomBar = { BottomNavigationBar(navController = navController) }
@@ -223,6 +227,25 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                             Spacer(Modifier.padding(end = 15.dp))
                         }
                     }
+                }
+                Button(
+                    onClick = {
+                        Firestore().deleteEntry(currentEntry, context)
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp),
+                    colors = ButtonColors(
+                        containerColor = Color.Red,
+                        contentColor = Color.White,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.White
+                    )
+                ){
+                    Text(
+                        text = "Delete"
+                    )
                 }
             }
         }
