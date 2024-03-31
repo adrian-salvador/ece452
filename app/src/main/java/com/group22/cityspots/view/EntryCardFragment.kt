@@ -35,7 +35,12 @@ import coil.compose.AsyncImage
 import com.group22.cityspots.model.Entry
 
 @Composable
-fun EntryCardFragment(navController: NavController?, entry: Entry, index:Int?, height:Dp, modifier: Modifier = Modifier){
+fun EntryCardFragment(navController: NavController?, entry: Entry, index:Int?, height:Dp, modifier: Modifier = Modifier, friend: Boolean = false, userId: String = "", username: String = ""){
+
+    var path = "entry/${entry.entryId}"
+    if (friend) {
+        path = "friendEntry/${entry.entryId}/${userId}/${username}"
+    }
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -43,7 +48,7 @@ fun EntryCardFragment(navController: NavController?, entry: Entry, index:Int?, h
             .clip(RoundedCornerShape(20.dp))
             .background(Color(0xffd5d4d7))
             .clickable {
-                navController?.navigate("entry/${entry.entryId}")
+                navController?.navigate(path)
             }
     ) {
         if (entry.pictures?.isNotEmpty() == true) {

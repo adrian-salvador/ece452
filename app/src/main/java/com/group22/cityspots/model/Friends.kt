@@ -1,6 +1,8 @@
 package com.group22.cityspots.model
 
 data class Friends (
-    val userID: String,
-    val friendIDs: MutableList<String>?
+    val userId: String? = null,
+    val friendIDs: MutableList<String>? = mutableListOf(),
+    val sentRequests: MutableList<String>? = mutableListOf(),
+    val recvRequests: MutableList<String>? = mutableListOf(),
 )

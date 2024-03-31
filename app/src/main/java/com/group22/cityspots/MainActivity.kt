@@ -43,6 +43,8 @@ import com.google.android.libraries.places.api.Places
 import com.group22.cityspots.model.GoogleAuthUIClient
 import com.group22.cityspots.view.AddEntryScreen
 import com.group22.cityspots.view.EntryScreen
+import com.group22.cityspots.view.FriendEntryScreen
+import com.group22.cityspots.view.FriendRankingScreen
 import com.group22.cityspots.view.FriendsScreen
 import com.group22.cityspots.view.HomeScreen
 import com.group22.cityspots.view.ProfileScreen
@@ -184,8 +186,28 @@ class MainActivity : ComponentActivity() {
                             AddEntryScreen(navController, backStackEntry, userViewModel, mapViewModel)
                         }
                         composable("friends") { FriendsScreen(navController, userViewModel) }
+                        composable(
+                            route = "friendsRanking/{userId}/{userName}",
+                            arguments = listOf(
+                                navArgument("userId") { type = NavType.StringType },
+                                navArgument("userName") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            FriendRankingScreen(navController, backStackEntry)
+                        }
+                        composable(
+                            route = "friendEntry/{entryId}/{userId}/{userName}",
+                            arguments = listOf(
+                                navArgument("entryId") { type = NavType.StringType },
+                                navArgument("userId") { type = NavType.StringType },
+                                navArgument("userName") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            FriendEntryScreen(navController, backStackEntry)
+                        }
                         composable("userProfile") {
                             ProfileScreen(
+                                navController,
                                 userLoginData = googleAuthUIClient.getSignedInUser(),
                                 onSignOut = {
                                     lifecycleScope.launch {
