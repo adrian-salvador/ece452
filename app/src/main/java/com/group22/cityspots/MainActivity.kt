@@ -173,7 +173,7 @@ class MainActivity : ComponentActivity() {
                             route = "entry/{entryId}",
                             arguments = listOf(navArgument("entryId") { type = NavType.StringType })
                         ) { backStackEntry ->
-                            EntryScreen(navController, backStackEntry, userViewModel)
+                            EntryScreen(navController, backStackEntry, userViewModel, mapViewModel)
                         }
                         composable(
                             route = "addEntry/{entryId}",
