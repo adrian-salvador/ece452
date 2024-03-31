@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +58,7 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
     val user by userViewModel.userLiveData.observeAsState()
 
     val cities by userViewModel.citiesLiveData.observeAsState(mutableListOf())
-    var selectedCity by remember { mutableStateOf("") }
+    var selectedCity by remember { mutableStateOf("No City Selected") }
 
     var addCityModalVisible by remember { mutableStateOf(false)}
 
@@ -67,7 +68,6 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
 
     // entries within the same city
     val entries by entryScreenViewModel.cityEntriesLiveData.observeAsState()
-    entryScreenViewModel.loadCityEntries(selectedCity)
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -79,8 +79,9 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
         selectedCity = it
     }
 
-    // .split(",").first().trim()
-    // selectedCity = if (cities.isEmpty()) "No City Selected" else cities[0]
+    if (selectedCity == "No City Selected" && cities.isNotEmpty()){
+        selectedCity = cities[0]
+    }
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
@@ -107,7 +108,7 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                         ) {
                             Text(
                                 text = (
-                                    if (selectedCity == "No City Selected") selectedCity
+                                    if (selectedCity == "No City Selected") "No City Selected"
                                     else selectedCity.split(",").first().trim()
                                 ),
                                 style = MaterialTheme.typography.titleMedium
@@ -127,6 +128,7 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                                     text = { Text(city) },
                                     onClick = {
                                         selectedCity = city
+                                        entryScreenViewModel.loadCityEntries(selectedCity)
                                         expanded = false
                                     }
                                 )
