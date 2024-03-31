@@ -16,6 +16,7 @@ import okhttp3.internal.wait
 class AddEntryViewModel(private val userId: String) : ViewModel() {
     val ratingLiveData = MutableLiveData<Double>()
     val entriesLiveData = MutableLiveData<List<Entry>>()
+    val editEntry = MutableLiveData<Entry>()
     val tags = MutableLiveData<List<String>>()
 
     init {
@@ -25,6 +26,12 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
 
     fun updateRating(newRating: Double) {
         ratingLiveData.value = newRating
+    }
+
+    fun updateEditEntry(entryId: String) {
+        val newEditEntry = entriesLiveData.value?.find { entry -> entry.entryId == entryId }
+        print(newEditEntry)
+        editEntry.postValue(newEditEntry!!)
     }
 
     fun addTag(tag: String) {

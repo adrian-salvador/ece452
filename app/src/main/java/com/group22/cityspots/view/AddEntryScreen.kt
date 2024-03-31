@@ -1,4 +1,4 @@
- package com.group22.cityspots.view
+package com.group22.cityspots.view
 
 import android.net.Uri
 import android.util.Log
@@ -67,6 +67,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -83,9 +84,15 @@ import com.group22.cityspots.viewmodel.TripViewModelFactory
 import okhttp3.internal.wait
 
 
- @Composable
-fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, mapViewModel: MapViewModel) {
+@Composable
+fun AddEntryScreen(
+    navController: NavController,
+    navBackStackEntry: NavBackStackEntry,
+    userViewModel: UserViewModel,
+    mapViewModel: MapViewModel
+) {
     val user by userViewModel.userLiveData.observeAsState()
+
     var entryName by remember { mutableStateOf("") }
     var hasTitle by remember { mutableStateOf(false) }
     var description by remember { mutableStateOf("") }
@@ -94,9 +101,13 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
         factory = TripViewModelFactory(user!!.userId)
     )
     val trips by tripViewModel.tripsLiveData.observeAsState()
+    val entryId = navBackStackEntry.arguments?.getString("entryId")
     val addEntryViewModel: AddEntryViewModel = viewModel(
         factory = AddEntryViewModelFactory(user!!.userId)
     )
+
+    val editEntry by addEntryViewModel.editEntry.observeAsState()
+    val entries by addEntryViewModel.entriesLiveData.observeAsState()
     val tags = addEntryViewModel.tags.observeAsState(listOf())
     val rating by addEntryViewModel.ratingLiveData.observeAsState(0.00)
     var showRatingPopup by remember { mutableStateOf(false) }
@@ -109,17 +120,27 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
             uri?.let { imageUris.add(it) }
         }
     )
+
     fun refreshTrips() {
-        tripViewModel.refreshTrips() // This function should refresh the tripsLiveData in your ViewModel
+        tripViewModel.refreshTrips()
     }
+
 
     var displayMap by remember { mutableStateOf(false) }
 
+
     val context = LocalContext.current
 
-    Box(modifier = Modifier
-        .background(Color(0x2F84ABE4))
-        .padding(10.dp)
+    if (entries != null && editEntry == null){
+        if (entryId != null) {
+            addEntryViewModel.updateEditEntry(entryId)
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .background(Color(0x2F84ABE4))
+            .padding(10.dp)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -154,11 +175,16 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
             }
 
             DisplayLocation(
-                onClick = {displayMap = !displayMap},
+                onClick = { displayMap = !displayMap },
                 mapViewModel = mapViewModel
             )
 
-            TripEntry(trips ?: emptyList<Trip>(), tripId, user!!.userId, showAddTripCallback) { newTripId ->
+            TripEntry(
+                trips ?: emptyList<Trip>(),
+                tripId,
+                user!!.userId,
+                showAddTripCallback
+            ) { newTripId ->
                 tripId = newTripId
             }
 
@@ -212,11 +238,16 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
                             rating = rating.toDouble(),
                             userId = user!!.userId
                         )
-                        addEntryViewModel.uploadImagesAndCreateEntry(imageUris, entryDetails, context )
+                        addEntryViewModel.uploadImagesAndCreateEntry(
+                            imageUris,
+                            entryDetails,
+                            context
+                        )
 
                         navController.popBackStack()
-                    }else {
-                        Toast.makeText(context, "Please add an Activity Name", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(context, "Please add an Activity Name", Toast.LENGTH_LONG)
+                            .show()
                     }
                 }) {
                     Text("Add Entry")
@@ -259,14 +290,14 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
             modifier = Modifier.fillMaxSize()
         ) {
             MapScreen(
-                close = {displayMap = false},
+                close = { displayMap = false },
                 viewModel = mapViewModel
             )
         }
     }
 }
 
- @Composable
+@Composable
 fun CroppedSquareImage(imageUri: Uri) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current).data(data = imageUri)
@@ -285,8 +316,13 @@ fun CroppedSquareImage(imageUri: Uri) {
 }
 
 @Composable
-fun LocationNameEntry(entryName: String, hasTitle: Boolean, modifier: Modifier, onValueChange: (String, Boolean) -> Unit) {
-    Box (modifier = modifier){
+fun LocationNameEntry(
+    entryName: String,
+    hasTitle: Boolean,
+    modifier: Modifier,
+    onValueChange: (String, Boolean) -> Unit
+) {
+    Box(modifier = modifier) {
         if (!hasTitle) {
             Text(
                 text = "Activity Name",
@@ -330,117 +366,126 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
     }
 }
 
- @Composable
- fun TripEntry(trips: List<Trip>, tripId: String, userId: String, showAddTripCallback: () -> Unit, onValueChange: (String) -> Unit) {
-     var expanded by remember { mutableStateOf(false) }
-     var selectedTrip by remember { mutableStateOf("") }
-     var triggerRowWidth by remember { mutableIntStateOf(0) }
-     trips.forEach { trip ->
-         if (trip.tripId == tripId) {
-             selectedTrip = trip.title
-             return@forEach
-         }
-     }
+@Composable
+fun TripEntry(
+    trips: List<Trip>,
+    tripId: String,
+    userId: String,
+    showAddTripCallback: () -> Unit,
+    onValueChange: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedTrip by remember { mutableStateOf("") }
+    var triggerRowWidth by remember { mutableIntStateOf(0) }
+    trips.forEach { trip ->
+        if (trip.tripId == tripId) {
+            selectedTrip = trip.title
+            return@forEach
+        }
+    }
 
-     Row(
-         modifier = Modifier
-             .fillMaxWidth()
-             .padding(top = 15.dp)
-             .clip(RoundedCornerShape(15.dp))
-             .background(Color.White)
-     ) {
-         Column(
-             modifier = Modifier
-                 .fillMaxWidth()
-                 .padding(vertical = 12.dp),
-         ) {
-             Text(
-                 text = "Trip:",
-                 modifier = Modifier.padding(start = 18.dp)
-             )
-             Spacer(modifier = Modifier.height(8.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 15.dp)
+            .clip(RoundedCornerShape(15.dp))
+            .background(Color.White)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
+        ) {
+            Text(
+                text = "Trip:",
+                modifier = Modifier.padding(start = 18.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
 
-                 Row(verticalAlignment = Alignment.CenterVertically) {
-                     Box(
-                         contentAlignment = Alignment.CenterStart,
-                         modifier = Modifier
-                             .onSizeChanged { newSize -> triggerRowWidth = newSize.width }
-                             .weight(1f)
-                             .clip(RoundedCornerShape(4.dp))
-                             .background(Color.White)
-                             .clickable(onClick = { expanded = true })
-                             .padding(horizontal = 18.dp, vertical = 8.dp)
-                             .border(
-                                 width = 1.dp,
-                                 color = Color.Gray,
-                                 shape = RoundedCornerShape(8.dp)
-                             )
-                             .padding(
-                                 horizontal = 12.dp,
-                                 vertical = 8.dp
-                             )
-                     ) {
-                         Row(
-                             verticalAlignment = Alignment.CenterVertically,
-                         ) {
-                             Text(
-                                 selectedTrip,
-                                 modifier = Modifier.weight(1f)
-                             )
-                             Icon(
-                                 imageVector = Icons.Default.ArrowDropDown,
-                                 contentDescription = "Dropdown",
-                                 modifier = Modifier
-                                     .size(24.dp)
-                                     .align(Alignment.CenterVertically)
-                             )
-                         }
-                     }
-                     Button(
-                         onClick = { showAddTripCallback() },
-                         shape = RoundedCornerShape(8.dp),
-                         modifier = Modifier
-                             .padding(end = 18.dp)
-                     ) {
-                         Icon(
-                             imageVector = Icons.Filled.Add,
-                             contentDescription = null,
-                         )
-                     }
-                 }
-             Row {
-                 Spacer(modifier = Modifier.width(18.dp))
-                 Box(modifier = Modifier.width(300.dp)){
-                     DropdownMenu(
-                         expanded = expanded,
-                         onDismissRequest = { expanded = false },
-                         modifier = Modifier
-                             .background(Color.White)
-                             .width(with(LocalDensity.current) { triggerRowWidth.toDp() - 36.dp})
-                     ) {
-                         trips.forEach { trip ->
-                             DropdownMenuItem(
-                                 modifier = Modifier
-                                     .padding(vertical = 8.dp)
-                                     .clip(RoundedCornerShape(8.dp)),
-                                 text = { Text(text = trip.title) },
-                                 onClick = {
-                                     onValueChange(trip.tripId!!)
-                                     expanded = false
-                                 }
-                             )
-                             if (trip != trips.last()) {
-                                 HorizontalDivider(color = Color.LightGray, modifier = Modifier.padding(horizontal = 15.dp))
-                             }
-                         }
-                     }
-                 }
-             }
-         }
-     }
- }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier
+                        .onSizeChanged { newSize -> triggerRowWidth = newSize.width }
+                        .weight(1f)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color.White)
+                        .clickable(onClick = { expanded = true })
+                        .padding(horizontal = 18.dp, vertical = 8.dp)
+                        .border(
+                            width = 1.dp,
+                            color = Color.Gray,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(
+                            horizontal = 12.dp,
+                            vertical = 8.dp
+                        )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            selectedTrip,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = "Dropdown",
+                            modifier = Modifier
+                                .size(24.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                    }
+                }
+                Button(
+                    onClick = { showAddTripCallback() },
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier
+                        .padding(end = 18.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = null,
+                    )
+                }
+            }
+            Row {
+                Spacer(modifier = Modifier.width(18.dp))
+                Box(modifier = Modifier.width(300.dp)) {
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .background(Color.White)
+                            .width(with(LocalDensity.current) { triggerRowWidth.toDp() - 36.dp })
+                    ) {
+                        trips.forEach { trip ->
+                            DropdownMenuItem(
+                                modifier = Modifier
+                                    .padding(vertical = 8.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                text = { Text(text = trip.title) },
+                                onClick = {
+                                    onValueChange(trip.tripId!!)
+                                    expanded = false
+                                }
+                            )
+                            if (trip != trips.last()) {
+                                HorizontalDivider(
+                                    color = Color.LightGray,
+                                    modifier = Modifier.padding(horizontal = 15.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
- @Composable
+@Composable
 fun TagEntry(tags: MutableList<String>) {
     var newTag by remember { mutableStateOf("") }
 
@@ -506,7 +551,10 @@ fun DisplayLocation(onClick: () -> Unit, mapViewModel: MapViewModel) {
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Log.d("hehexd", "AddEntryScreen: mapViewModel.currentPlace = ${mapViewModel.currentPlace}")
+                Log.d(
+                    "hehexd",
+                    "AddEntryScreen: mapViewModel.currentPlace = ${mapViewModel.currentPlace}"
+                )
                 Text(
                     text = mapViewModel.currentPlace,
                     style = TextStyle(fontWeight = FontWeight.Bold)
