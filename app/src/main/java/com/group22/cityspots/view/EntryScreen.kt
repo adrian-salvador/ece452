@@ -1,15 +1,13 @@
 package com.group22.cityspots.view
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,17 +17,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,13 +41,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import coil.compose.AsyncImage
-import com.group22.cityspots.model.Entry
+import com.google.android.gms.maps.model.LatLng
 import com.group22.cityspots.respository.Firestore
 import com.group22.cityspots.viewmodel.AddEntryViewModel
 import com.group22.cityspots.viewmodel.AddEntryViewModelFactory
@@ -57,12 +54,14 @@ import com.group22.cityspots.viewmodel.EntryScreenViewModel
 import com.group22.cityspots.viewmodel.EntryScreenViewModelFactory
 import com.group22.cityspots.viewmodel.EntryViewModel
 import com.group22.cityspots.viewmodel.EntryViewModelFactory
+import com.group22.cityspots.viewmodel.MapViewModel
 import com.group22.cityspots.viewmodel.TripViewModel
 import com.group22.cityspots.viewmodel.TripViewModelFactory
 import com.group22.cityspots.viewmodel.UserViewModel
 
+
 @Composable
-fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEntry, userViewModel: UserViewModel) {
+fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEntry, userViewModel: UserViewModel, mapViewModel: MapViewModel) {
     val user by userViewModel.userLiveData.observeAsState()
     val entryId = navBackStackEntry.arguments!!.getString("entryId")
     val entryScreenViewModel: EntryScreenViewModel = viewModel(
@@ -80,13 +79,14 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
             return@forEach
         }
     }
+    var showMap by remember { mutableStateOf(false) }
     val context = LocalContext.current
-
-
-
-
     Scaffold (
-        bottomBar = { BottomNavigationBar(navController = navController) }
+        bottomBar = {
+            if (!showMap) {
+                BottomNavigationBar(navController = navController)
+            }
+        }
     ) { innerPadding ->
         currentEntry?.let { entry ->
             Box(modifier = Modifier.padding(innerPadding)) {
@@ -156,12 +156,30 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
 
                         Spacer(Modifier.padding(end = 20.dp))
                     }
-                    Row {
-                        Box(
-                            Modifier.padding(start = 20.dp)
+                    Surface(
+                        modifier = Modifier
+                            .padding(start = 20.dp)
+                            .clickable {
+                               showMap = true
+                            },
+                        color = Color(0xFFDBE8F9),
+                        contentColor = Color(0xFF176FF2),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
+                            Icon(
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = "Location",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(Modifier.padding(horizontal = 2.dp))
                             Text(
-                                text = if (entry.address.isNotEmpty()) entry.address else "No Location Data"
+                                text = if (entry.address.isNotEmpty()) entry.address else "No Location Data",
+                                fontSize = 14.sp
                             )
                         }
                     }
@@ -282,6 +300,12 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                     Text(
                         text = "Delete"
                     )
+                }
+
+                if (showMap) {
+                    MapScreen(mapViewModel, LatLng(currentEntry.latitude, currentEntry.longitude)) {
+                        showMap = false
+                    }
                 }
             }
         }

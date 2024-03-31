@@ -100,6 +100,8 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
             val tags = entriesInGrouped.map { it.tags }.flatten()
             val placeId = entriesInGrouped.first().placeId
             val address = entriesInGrouped.first().address
+            val latitude = entriesInGrouped.first().latitude
+            val longitude = entriesInGrouped.first().longitude
 
             // create a new entry with information above and store into entriesToAddToDisplay
             entriesToAddToDisplay.add(Entry(
@@ -110,6 +112,8 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                 tags = tags,
                 placeId = placeId,
                 address = address,
+                latitude = latitude,
+                longitude = longitude,
                 rating = averageRating
             ))
         }

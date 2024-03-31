@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
@@ -51,8 +52,10 @@ import com.group22.cityspots.viewmodel.MapViewModel
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
+    entryLocation: LatLng? = null,
     close: () -> Unit
 ) {
+    if (entryLocation != null) viewModel.currentLatLong = entryLocation
     val uiSettings = remember{MapUiSettings()}
     val cameraPositionState = rememberCameraPositionState{
         position = CameraPosition.fromLatLngZoom(
@@ -82,64 +85,73 @@ fun MapScreen(
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
-            Surface(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                color = Color.Transparent,
-                shape = RoundedCornerShape(8.dp),
-                shadowElevation = 10.dp
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
+            if (entryLocation == null) {
+                Surface(
                     modifier = Modifier
-                        .background(Color.White)
+                        .align(Alignment.TopCenter)
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    color = Color.Transparent,
+                    shape = RoundedCornerShape(8.dp),
+                    shadowElevation = 10.dp
                 ) {
-                    var text by remember { mutableStateOf("") }
-                    TextField(
-                        value = text,
-                        label = { Text(
-                            "Search for a location",
-                            style = TextStyle(
-                                fontSize = if (searchBarFocused) 12.sp else 14.sp
-                            )
-                        ) },
-                        textStyle = TextStyle(
-                            fontSize = 14.sp
-                        ),
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color.White, focusedContainerColor = Color.White, unfocusedIndicatorColor = Color.Transparent, focusedIndicatorColor = Color.Transparent),
-                        onValueChange = {
-                            text = it
-                            viewModel.searchPlaces(it)
-                        },
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .onFocusChanged {
-                                searchBarFocused = it.isFocused
-                            }
-                    )
-                    AnimatedVisibility(
-                        viewModel.locationAutofill.isNotEmpty(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
+                            .background(Color.White)
                     ) {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        var text by remember { mutableStateOf("") }
+                        TextField(
+                            value = text,
+                            label = {
+                                Text(
+                                    "Search for a location",
+                                    style = TextStyle(
+                                        fontSize = if (searchBarFocused) 12.sp else 14.sp
+                                    )
+                                )
+                            },
+                            textStyle = TextStyle(
+                                fontSize = 14.sp
+                            ),
+                            colors = TextFieldDefaults.colors(
+                                unfocusedContainerColor = Color.White,
+                                focusedContainerColor = Color.White,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent
+                            ),
+                            onValueChange = {
+                                text = it
+                                viewModel.searchPlaces(it)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .onFocusChanged {
+                                    searchBarFocused = it.isFocused
+                                }
+                        )
+                        AnimatedVisibility(
+                            viewModel.locationAutofill.isNotEmpty(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
                         ) {
-                            itemsIndexed(viewModel.locationAutofill) { index, item ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp)
-                                        .clickable {
-                                            text = item.address
-                                            viewModel.locationAutofill.clear()
-                                            viewModel.getCoordinates(item)
-                                        }
-                                ) {
-                                    Text(item.address)
+                            LazyColumn(
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                itemsIndexed(viewModel.locationAutofill) { index, item ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp)
+                                            .clickable {
+                                                text = item.address
+                                                viewModel.locationAutofill.clear()
+                                                viewModel.getCoordinates(item)
+                                            }
+                                    ) {
+                                        Text(item.address)
+                                    }
                                 }
                             }
                         }
@@ -158,7 +170,12 @@ fun MapScreen(
                 contentPadding = PaddingValues(6.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp)
             ) {
-                Icon(Icons.Filled.Check, "Save Location")
+                if (entryLocation == null) {
+                    Icon(Icons.Filled.Check, "Save Location")
+                }
+                else {
+                    Text(text = "Back")
+                }
             }
         }
     }

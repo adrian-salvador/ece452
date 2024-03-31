@@ -133,6 +133,8 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
                 tags = entryDetails.tags,
                 placeId = entryDetails.placeId,
                 address = entryDetails.address,
+                latitude = entryDetails.latitude,
+                longitude = entryDetails.longitude,
                 rating = ratingLiveData.value ?: 0.0,
                 userId = userId
             )

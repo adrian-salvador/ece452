@@ -1,11 +1,9 @@
 package com.group22.cityspots.view
 
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,7 +35,9 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,14 +45,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -73,19 +69,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
 import com.group22.cityspots.model.Entry
-import com.group22.cityspots.model.GeoLocation
 import com.group22.cityspots.model.Trip
 import com.group22.cityspots.viewmodel.AddEntryViewModel
 import com.group22.cityspots.viewmodel.AddEntryViewModelFactory
 import com.group22.cityspots.viewmodel.MapViewModel
-import com.group22.cityspots.viewmodel.UserViewModel
 import com.group22.cityspots.viewmodel.TripViewModel
 import com.group22.cityspots.viewmodel.TripViewModelFactory
-import okhttp3.internal.wait
+import com.group22.cityspots.viewmodel.UserViewModel
 
 
 @Composable
@@ -280,6 +271,8 @@ fun AddEntryScreen(
                             tripId = tripId,
                             placeId = mapViewModel.currentPlaceId,
                             address = mapViewModel.currentAddress,
+                            latitude = mapViewModel.currentLatLong.latitude,
+                            longitude = mapViewModel.currentLatLong.longitude,
                             rating = rating.toDouble(),
                             userId = user!!.userId
                         )
@@ -578,7 +571,6 @@ fun DisplayLocation(onClick: () -> Unit, mapViewModel: MapViewModel) {
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Log.d("hehexd", "AddEntryScreen: mapViewModel.currentPlace = ${mapViewModel.currentPlace}")
                 Text(
                     text = mapViewModel.currentPlace,
                     style = TextStyle(fontWeight = FontWeight.Bold)
