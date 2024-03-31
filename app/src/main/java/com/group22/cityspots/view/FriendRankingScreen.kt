@@ -40,12 +40,10 @@ import com.group22.cityspots.viewmodel.UserViewModel
 @Composable
 fun FriendRankingScreen(
     navController: NavController,
-    backStackEntry: NavBackStackEntry,
-    userViewModel: UserViewModel
+    backStackEntry: NavBackStackEntry
 ) {
     val userId = backStackEntry.arguments!!.getString("userId")
     val username = backStackEntry.arguments!!.getString("userName")
-    val user by userViewModel.userLiveData.observeAsState()
     val rankingScreenViewModel: RankingScreenViewModel = viewModel(
         factory = RankingScreenViewModelFactory(userId!!)
     )
@@ -147,7 +145,7 @@ fun FriendRankingScreen(
                 ) {
                     rowEntries.forEachIndexed { columnIndex, entry ->
                         val index = rowIndex * 2 + columnIndex
-                        EntryCardFragment(navController = navController, entry = entry, index = index, height = 200.dp, modifier = Modifier.weight(1f) )
+                        EntryCardFragment(navController = navController, entry = entry, index = index, height = 200.dp, modifier = Modifier.weight(1f), friend = true, userId = userId, username = username )
                         if (rowEntries.size < 2) {
                             Spacer(modifier = Modifier.weight(1f))
                         }

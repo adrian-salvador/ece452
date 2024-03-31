@@ -79,28 +79,27 @@ class Firestore {
     fun sendFriendReq(email: String, user: User, context: Context) = CoroutineScope(Dispatchers.IO).launch {
 
         try {
-            val querySnapshot = usersCollectionRef
+            usersCollectionRef
                 .whereEqualTo("email", email)
                 .get().await()
-            val userID = querySnapshot.documents.first().get("userId")
 
             try {
                 println("Email $email")
                 val querySnapshot2 = friendsCollectionRef
-                    .whereEqualTo("userId", userID)
+                    .whereEqualTo("userId", email)
                     .get().await()
                 val documentSnapshot = querySnapshot2.documents.first()
-                friendsCollectionRef.document(documentSnapshot.id).update("recvRequests", FieldValue.arrayUnion(user.email))
+                friendsCollectionRef.document(documentSnapshot.id).update("recvRequests", FieldValue.arrayUnion(user.email)).await()
 
                 val currUserQuery = friendsCollectionRef
-                    .whereEqualTo("userId", user.userId)
+                    .whereEqualTo("userId", user.email)
                     .get().await()
                 val currUserDoc = currUserQuery.documents.first()
-                friendsCollectionRef.document(currUserDoc.id).update("sentRequests", FieldValue.arrayUnion(email))
+                friendsCollectionRef.document(currUserDoc.id).update("sentRequests", FieldValue.arrayUnion(email)).await()
 
             } catch (e: Exception) {
                 val newFriend =  Friends(
-                    userId = userID.toString(),
+                    userId = email,
                     friendIDs = mutableListOf(),
                     recvRequests = mutableListOf(user.email!!),
                     sentRequests = mutableListOf(),
@@ -110,10 +109,10 @@ class Firestore {
                 friendsCollectionRef.document(friendID).update("friendID", friendID).await()
 
                 val currUserQuery = friendsCollectionRef
-                    .whereEqualTo("userId", user.userId)
+                    .whereEqualTo("userId", user.email)
                     .get().await()
                 val currUserDoc = currUserQuery.documents.first()
-                friendsCollectionRef.document(currUserDoc.id).update("sentRequests", FieldValue.arrayUnion(email))
+                friendsCollectionRef.document(currUserDoc.id).update("sentRequests", FieldValue.arrayUnion(email)).await()
             }
 
         } catch (e: Exception) {
@@ -125,32 +124,27 @@ class Firestore {
 
     fun modFriendReq(email: String, user: User, action: Boolean, context: Context) = CoroutineScope(Dispatchers.IO).launch {
 
-        val querySnapshot = usersCollectionRef
-            .whereEqualTo("email", email)
-            .get().await()
-        val userID = querySnapshot.documents.first().get("userId")
-
         try {
             println("Email $email")
             val querySnapshot2 = friendsCollectionRef
-                .whereEqualTo("userId", userID)
+                .whereEqualTo("userId", email)
                 .get().await()
             val documentSnapshot = querySnapshot2.documents.first()
 
             val currUserQuery = friendsCollectionRef
-                .whereEqualTo("userId", user.userId)
+                .whereEqualTo("userId", user.email)
                 .get().await()
             val currUserDoc = currUserQuery.documents.first()
 
-            friendsCollectionRef.document(documentSnapshot.id).update("sentRequests", FieldValue.arrayRemove(user.email))
-            friendsCollectionRef.document(currUserDoc.id).update("recvRequests", FieldValue.arrayRemove(email))
+            friendsCollectionRef.document(documentSnapshot.id).update("sentRequests", FieldValue.arrayRemove(user.email)).await()
+            friendsCollectionRef.document(currUserDoc.id).update("recvRequests", FieldValue.arrayRemove(email)).await()
 
 
             if (action) {
                 friendsCollectionRef.document(documentSnapshot.id)
-                    .update("friendIDs", FieldValue.arrayUnion(user.userId))
+                    .update("friendIDs", FieldValue.arrayUnion(user.email)).await()
                 friendsCollectionRef.document(currUserDoc.id)
-                    .update("friendIDs", FieldValue.arrayUnion(userID))
+                    .update("friendIDs", FieldValue.arrayUnion(email)).await()
             }
 
         } catch (e: Exception) {
@@ -237,7 +231,7 @@ class Firestore {
             val friendsList: MutableList<User> = mutableListOf()
 
             userIds.forEach { userId ->
-                val querySnapshot = usersCollectionRef.whereEqualTo("userId", userId).get().await()
+                val querySnapshot = usersCollectionRef.whereEqualTo("email", userId).get().await()
 
                 if (!querySnapshot.isEmpty) {
                     val documentSnapshot = querySnapshot.documents.first()

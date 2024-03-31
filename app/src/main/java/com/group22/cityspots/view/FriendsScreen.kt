@@ -3,6 +3,7 @@ package com.group22.cityspots.view
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,6 +59,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.group22.cityspots.model.Friends
 import com.group22.cityspots.model.User
+import com.group22.cityspots.ui.theme.Purple40
+import com.group22.cityspots.ui.theme.Purple80
 import com.group22.cityspots.viewmodel.FriendsViewModel
 import com.group22.cityspots.viewmodel.FriendsViewModelFactory
 import com.group22.cityspots.viewmodel.UserViewModel
@@ -66,13 +69,58 @@ import com.group22.cityspots.viewmodel.UserViewModel
 fun FriendsScreen(navController: NavController, userViewModel: UserViewModel) {
     val user by userViewModel.userLiveData.observeAsState()
     val friendsViewModel: FriendsViewModel = viewModel(
-        factory = FriendsViewModelFactory(user!!.userId)
+        factory = FriendsViewModelFactory(user!!.email!!)
     )
     val friendUser by friendsViewModel.friendUser.observeAsState()
     val friends by friendsViewModel.friendsLiveData.observeAsState()
 
     var showFriends by remember { mutableStateOf(true) }
     var showAddFriend by remember { mutableStateOf(false) }
+
+    val buttonColour: ButtonColors = if (showFriends) {
+        ButtonColors(
+            containerColor = Color.White,
+            disabledContainerColor = Color.White,
+            contentColor = Color.White,
+            disabledContentColor = Color.White
+        )
+    } else {
+        ButtonColors(
+            containerColor = Color(0xff435e91),
+            disabledContainerColor = Color(0xff435e91),
+            contentColor = Color(0xff435e91),
+            disabledContentColor = Color(0xff435e91)
+        )
+    }
+    val buttonBGColor = if (showFriends) {
+        Color.White
+    } else {
+        Color(0xff435e91)
+    }
+    val textColor = if (showFriends) { Color(0xff435e91) } else { Color.White  }
+
+    val buttonColour2: ButtonColors = if (!showFriends) {
+        ButtonColors(
+            containerColor = Color.White,
+            disabledContainerColor = Color.White,
+            contentColor = Color.White,
+            disabledContentColor = Color.White
+        )
+    } else {
+        ButtonColors(
+            containerColor = Color(0xff435e91),
+            disabledContainerColor = Color(0xff435e91),
+            contentColor = Color(0xff435e91),
+            disabledContentColor = Color(0xff435e91)
+        )
+    }
+    val buttonBGColor2 = if (!showFriends) {
+        Color.White
+    } else {
+        Color(0xff435e91)
+    }
+    val textColor2 = if (!showFriends) { Color(0xff435e91) } else { Color.White  }
+
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
@@ -82,18 +130,22 @@ fun FriendsScreen(navController: NavController, userViewModel: UserViewModel) {
                 verticalArrangement = Arrangement.spacedBy(5.dp),
                 modifier = Modifier
                     .padding(18.dp)
-//                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState())
             ) {
                 Row(modifier = Modifier
-                    .padding(16.dp)
+                    .padding(13.dp)
                     .fillMaxWidth()) {
                     Button(
                         onClick = { showFriends = true },
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .border(width = 1.dp, color = Color(0xff435e91), shape = RoundedCornerShape(30.dp))
+                            .background(color = buttonBGColor, shape = RoundedCornerShape(30.dp)),
+                        colors = buttonColour
                     ) {
                         Text(
                             text = "Friends",
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                            style = MaterialTheme.typography.bodyLarge.copy(color = textColor),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
                         )
@@ -101,11 +153,15 @@ fun FriendsScreen(navController: NavController, userViewModel: UserViewModel) {
                     Spacer(modifier = Modifier.width(25.dp))
                     Button(
                         onClick = { showFriends = false },
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .border(width = 1.dp, color = Color(0xff435e91), shape = RoundedCornerShape(30.dp))
+                            .background(color = buttonBGColor2, shape = RoundedCornerShape(30.dp)),
+                        colors = buttonColour2
                     ) {
                         Text(
                             text = "Requests",
-                            style = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                            style = MaterialTheme.typography.bodyLarge.copy(color = textColor2),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
                         )
