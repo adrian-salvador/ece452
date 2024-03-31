@@ -109,14 +109,9 @@ fun AddEntryScreen(
 
     val editEntry by addEntryViewModel.editEntry.observeAsState()
     val entries by addEntryViewModel.entriesLiveData.observeAsState()
-    val currentEntry = entries?.find { entry -> entry.entryId == entryId }
     val tags = addEntryViewModel.tags.observeAsState(listOf())
-//    if (entryId!=null){
-//        val rating by addEntryViewModel.ratingLiveData.observeAsState(currentEntry!!.rating)
-//    } else {
-//    }
+
     val rating by addEntryViewModel.ratingLiveData.observeAsState(0.00)
-    //var ranking = 0.00 // baseline
     var showRatingPopup by remember { mutableStateOf(false) }
     var showAddTrip by remember { mutableStateOf(false) }
     val showAddTripCallback: () -> Unit = { showAddTrip = true }
@@ -236,42 +231,32 @@ fun AddEntryScreen(
             ) {
                 Button(onClick = {
                     if (hasTitle) {
-                        if (entryId != null) {
-                            val entryDetails = Entry(
-                                entryId = entryId,
-                                title = entryName,
-                                pictures = null,
-                                review = description,
-                                tags = tags.value,
-                                tripId = tripId,
-                                placeId = mapViewModel.currentPlaceId,
-                                address = mapViewModel.currentAddress,
-                                rating = rating.toDouble(),
-                                userId = user!!.userId
-                            )
-                            addEntryViewModel.updateEditEntry(entryId)
-                        }
-                        else {
-                            val entryDetails = Entry(
-                                entryId = null,
-                                title = entryName,
-                                pictures = null,
-                                review = description,
-                                tags = tags.value,
-                                tripId = tripId,
-                                placeId = mapViewModel.currentPlaceId,
-                                address = mapViewModel.currentAddress,
-                                rating = rating.toDouble(),
-                                userId = user!!.userId
-                            )
-                            addEntryViewModel.uploadImagesAndCreateEntry(imageUris, entryDetails, context )
-                        }
+                        println(entryId)
+                        val entryDetails = Entry(
+                            entryId = entryId,
+                            title = entryName,
+                            pictures = null,
+                            review = description,
+                            tags = tags.value,
+                            tripId = tripId,
+                            placeId = mapViewModel.currentPlaceId,
+                            address = mapViewModel.currentAddress,
+                            rating = rating.toDouble(),
+                            userId = user!!.userId
+                        )
+
+                        addEntryViewModel.uploadImagesAndCreateEntry(imageUris, entryDetails, context)
                         navController.popBackStack()
                     }else {
                         Toast.makeText(context, "Please add an Activity Name", Toast.LENGTH_LONG).show()
                     }
                 }) {
-                    Text("Add Entry")
+                    if (entryId == null){
+                        Text("Add Entry")
+                    } else {
+                        Text("Update Entry")
+                    }
+
                 }
             }
         }
