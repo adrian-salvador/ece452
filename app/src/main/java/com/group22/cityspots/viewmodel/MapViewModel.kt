@@ -88,7 +88,7 @@ class MapViewModel(context: Context) : ViewModel() {
         val request = FetchPlaceRequest.newInstance(result.placeId, placeFields)
         val addressArray = result.address.split(',')
         currentPlace = addressArray[0]
-        currentAddress = addressArray[addressArray.size - 3] + ',' +
+        currentAddress = addressArray[addressArray.size - 3].trimStart() + ',' +
                          addressArray[addressArray.size - 2] + ',' +
                          addressArray[addressArray.size - 1]
         currentPlaceId = result.placeId

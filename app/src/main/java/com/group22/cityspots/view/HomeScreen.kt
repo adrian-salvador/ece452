@@ -81,6 +81,7 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
 
     if (selectedCity == "No City Selected" && cities.isNotEmpty()){
         selectedCity = cities[0]
+        entryScreenViewModel.loadCityEntries(selectedCity)
     }
 
     Scaffold(
