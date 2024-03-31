@@ -67,7 +67,7 @@ fun TagEditorFragment(
                 }
             },
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
+                focusedContainerColor = Color(0xFFF3F8FE),
                 unfocusedContainerColor = Color(0xFFF3F8FE),
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
@@ -80,38 +80,40 @@ fun TagEditorFragment(
                 .height(50.dp)
         )
         Spacer(modifier = Modifier.height(10.dp))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(30.dp)
-        ) {
-            tags.value?.forEach { tag ->
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color(0xFFDBE8F9),
-                    contentColor = Color(0xFF176FF2),
-                    modifier = Modifier.clickable { removeTag(tag) }
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(
-                            start = 10.dp,
-                            end = 5.dp,
-                            top = 5.dp,
-                            bottom = 5.dp
-                        )
+        if (tags.value?.isNotEmpty() == true){
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(30.dp)
+            ){
+                tags.value?.forEach { tag ->
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = Color(0xFFDBE8F9),
+                        contentColor = Color(0xFF176FF2),
+                        modifier = Modifier.clickable { removeTag(tag) }
                     ) {
-                        Text(
-                            text = tag,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                        )
-                        Icon(
-                            imageVector = Icons.Filled.Clear,
-                            contentDescription = null,
-                            modifier = Modifier.size(15.dp),
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(
+                                start = 10.dp,
+                                end = 5.dp,
+                                top = 5.dp,
+                                bottom = 5.dp
+                            )
+                        ) {
+                            Text(
+                                text = tag,
+                                style = TextStyle(fontWeight = FontWeight.Bold),
+                            )
+                            Icon(
+                                imageVector = Icons.Filled.Clear,
+                                contentDescription = null,
+                                modifier = Modifier.size(15.dp),
+                            )
+                        }
                     }
                 }
             }
