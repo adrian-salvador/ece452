@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -21,14 +22,17 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -72,71 +77,81 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .height(40.dp)
-                        .weight(1f)
-                        .clip(RoundedCornerShape(4.dp))
-                        .clickable(onClick = { expanded = true })
-                        .border(
-                            width = 1.dp,
-                            color = Color.Gray,
-                            shape = RoundedCornerShape(8.dp)
-                        )
+            Text(text = "Rankings", fontWeight = FontWeight.Medium, fontSize = 36.sp)
+            Spacer(modifier = Modifier.height(20.dp))
+            Box(modifier = Modifier
+                .fillMaxWidth()
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        // Text field to display the selected trip's title
-                        Text(
-                            text = selectedTrip?.title ?: "Select a trip",
-                            modifier = Modifier
-                                .clickable { expanded = true }
-                                .background(Color.White)
-                                .padding(start = 48.dp, end = 136.dp),
-                            color = Color.Black
-                        )
+                Row(
+                    modifier = Modifier
+                        .clickable { expanded = true }
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(Color(0xFFF3F8FE))
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = selectedTrip?.title ?: "Select a trip",
+                        modifier = Modifier
+                            .padding(start = 15.dp),
+                        color = if (selectedTrip == null) Color.LightGray else Color.Black
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Dropdown",
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                }
 
-                        // Dropdown menu
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            DropdownMenuItem(
-                                modifier = Modifier
-                                    .padding(start = 48.dp, end = 136.dp)
-                                    .background(Color.White),
-                                text = { Text("All") },
-                                onClick = {
-                                    rankingScreenViewModel.setSelectedTrip(null)
-                                    expanded = false
-                                }
-                            )
-                            trips.forEach { trip ->
-                                DropdownMenuItem(
-                                    text = { Text(trip.title) },
-                                    onClick = {
-                                        rankingScreenViewModel.setSelectedTrip(trip)
-                                        expanded = false
-                                    }
-                                )
-                            }
+                // Dropdown menu
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .background(Color(0xFFF3F8FE))
+                        .width(350.dp)
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            rankingScreenViewModel.setSelectedTrip(null)
+                            expanded = false
+                        },
+                        text = { Text("None") }
+                    )
+
+                    if (trips.isNotEmpty()){
+                        HorizontalDivider(color = Color.LightGray, modifier = Modifier.padding(horizontal = 15.dp))
+                    }
+
+                    trips.forEachIndexed { index, trip ->
+                        DropdownMenuItem(
+                            onClick = {
+                                rankingScreenViewModel.setSelectedTrip(trip)
+                                expanded = false
+                            },
+                            text = { Text(trip.title) }
+                        )
+                        if (index < trips.size - 1) {
+                            HorizontalDivider(color = Color.LightGray, modifier = Modifier.padding(horizontal = 15.dp))
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
+
             TagEditorFragment(
                 tags = tags,
                 addTag = { tag -> rankingScreenViewModel.addTag(tag) },
                 removeTag = { tag -> rankingScreenViewModel.removeTag(tag) }
             )
+
             Spacer(modifier = Modifier.height(10.dp))
-            val chunkedEntries = entries?.chunked(2) ?: listOf()
+
+            val chunkedEntries = entries?.sortedByDescending{ it.rating }?.chunked(2) ?: listOf()
             chunkedEntries.forEachIndexed { rowIndex, rowEntries ->
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(20.dp),
@@ -146,7 +161,13 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                 ) {
                     rowEntries.forEachIndexed { columnIndex, entry ->
                         val index = rowIndex * 2 + columnIndex
-                        EntryCardFragment(navController = navController, entry = entry, index = index, height = 200.dp, modifier = Modifier.weight(1f) )
+                        EntryCardFragment(
+                            navController = navController,
+                            entry = entry,
+                            index = index,
+                            height = 200.dp,
+                            modifier = Modifier.weight(1f)
+                        )
                         if (rowEntries.size < 2) {
                             Spacer(modifier = Modifier.weight(1f))
                         }

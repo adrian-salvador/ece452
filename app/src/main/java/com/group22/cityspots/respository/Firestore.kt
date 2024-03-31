@@ -9,8 +9,8 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.group22.cityspots.model.Entry
 import com.group22.cityspots.model.Friends
-import com.group22.cityspots.model.User
 import com.group22.cityspots.model.Trip
+import com.group22.cityspots.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,6 +53,20 @@ class Firestore {
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, "Successfully Saved Entry", Toast.LENGTH_LONG).show()
             }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    fun deleteEntry(entry: Entry, context: Context) = CoroutineScope(Dispatchers.IO).launch {
+        try {
+            entriesCollectionRef.document(entry.entryId!!)
+                .delete()
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully Deleted Entry", Toast.LENGTH_LONG).show()
+                }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
@@ -261,6 +275,22 @@ class Firestore {
                 Toast.makeText(context, "Upload Failed: ${e.message}", Toast.LENGTH_LONG).show()
             }
             null
+        }
+    }
+
+    suspend fun deletePicture(imageUrl: String, context: Context): Boolean {
+        val storageRef = Firebase.storage.reference
+
+        return try {
+            val imageRef = storageRef.storage.getReferenceFromUrl(imageUrl)
+            imageRef.delete().await()
+            true
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+
+                Toast.makeText(context, "Deletion Failed: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+            false
         }
     }
 }
