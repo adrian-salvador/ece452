@@ -110,7 +110,7 @@ fun AddEntryScreen(
     val editEntry by addEntryViewModel.editEntry.observeAsState()
     val entries by addEntryViewModel.entriesLiveData.observeAsState()
     val currentEntry = entries?.find { entry -> entry.entryId == entryId }
-    var tags = addEntryViewModel.tags.observeAsState(listOf())
+    val tags = addEntryViewModel.tags.observeAsState(listOf())
 //    if (entryId!=null){
 //        val rating by addEntryViewModel.ratingLiveData.observeAsState(currentEntry!!.rating)
 //    } else {
