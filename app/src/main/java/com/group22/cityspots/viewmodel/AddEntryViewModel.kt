@@ -127,7 +127,7 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
                 userId = userId
             )
 
-            Firestore().updateEntry(newEntry, context)
+            //Firestore().updateEntry(newEntry, context)
         }
     }
 
