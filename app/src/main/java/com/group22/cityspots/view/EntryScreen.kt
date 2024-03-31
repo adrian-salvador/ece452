@@ -51,6 +51,10 @@ import androidx.navigation.NavOptions
 import coil.compose.AsyncImage
 import com.group22.cityspots.model.Entry
 import com.group22.cityspots.respository.Firestore
+import com.group22.cityspots.viewmodel.AddEntryViewModel
+import com.group22.cityspots.viewmodel.AddEntryViewModelFactory
+import com.group22.cityspots.viewmodel.EntryScreenViewModel
+import com.group22.cityspots.viewmodel.EntryScreenViewModelFactory
 import com.group22.cityspots.viewmodel.EntryViewModel
 import com.group22.cityspots.viewmodel.EntryViewModelFactory
 import com.group22.cityspots.viewmodel.TripViewModel
@@ -60,13 +64,11 @@ import com.group22.cityspots.viewmodel.UserViewModel
 @Composable
 fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEntry, userViewModel: UserViewModel) {
     val user by userViewModel.userLiveData.observeAsState()
-    val rankingScreenViewModel: EntryViewModel = viewModel(
-        factory = EntryViewModelFactory(user!!)
-    )
     val entryId = navBackStackEntry.arguments!!.getString("entryId")
-    println(entryId)
-    val entries by rankingScreenViewModel.entriesLiveData.observeAsState()
-    val currentEntry = entries?.find { entry -> entry.entryId == entryId }
+    val entryScreenViewModel: EntryScreenViewModel = viewModel(
+        factory = entryId?.let { EntryScreenViewModelFactory(it) }
+    )
+    val currentEntry by entryScreenViewModel.entry.observeAsState()
     val tripViewModel: TripViewModel = viewModel(
         factory = TripViewModelFactory(user!!.userId)
     )
@@ -80,10 +82,13 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
     }
     val context = LocalContext.current
 
+
+
+
     Scaffold (
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { innerPadding ->
-        if (currentEntry != null) {
+        currentEntry?.let { entry ->
             Box(modifier = Modifier.padding(innerPadding)) {
                 Column(
                     Modifier
@@ -100,7 +105,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                             .padding(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        for (image in currentEntry.pictures!!) {
+                        for (image in entry.pictures!!) {
                             Box(
                                 modifier = Modifier
                                     // change height and width to be dynamic in the future?
@@ -127,7 +132,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                                     .padding(start = 20.dp)
                                     .width(240.dp),
                                 style = MaterialTheme.typography.titleLarge,
-                                text = currentEntry.title
+                                text = entry.title
                             )
                         }
 
@@ -145,7 +150,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                                 modifier = Modifier.size(15.dp),
                                 tint = Color(0xfff8d675)
                             )
-                            Text(String.format("%.2f", currentEntry.rating), style = MaterialTheme.typography.bodyMedium)
+                            Text(String.format("%.2f", entry.rating), style = MaterialTheme.typography.bodyMedium)
 
                         }
 
@@ -156,7 +161,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                             Modifier.padding(start = 20.dp)
                         ) {
                             Text(
-                                text = if (currentEntry.address.isNotEmpty()) currentEntry.address else "No Location Data"
+                                text = if (entry.address.isNotEmpty()) entry.address else "No Location Data"
                             )
                         }
                     }
@@ -206,7 +211,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                                 .padding(20.dp)
                                 .width(310.dp)
                         ) {
-                            Text(text = currentEntry.review)
+                            Text(text = entry.review)
                         }
                     }
 
@@ -227,7 +232,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                             .padding(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        for (tag in currentEntry.tags) {
+                        for (tag in entry.tags) {
                             Box(
                                 Modifier
                                     .clip(RoundedCornerShape(40.dp))
@@ -251,11 +256,9 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                             .fillMaxWidth()
                             .padding(top = 30.dp)
                     ) {
-                        println("Current Entry 1: " + currentEntry.entryId)
-                        println("Current Entry 2: " + entryId)
 
                         Button(onClick = {
-                            navController?.navigate("addEntry/${currentEntry.entryId}")
+                            navController.navigate("addEntry/${entry.entryId}")
                         }) {
                             Text("Edit Entry")
                         }
@@ -263,7 +266,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                 }
                 Button(
                     onClick = {
-                        Firestore().deleteEntry(currentEntry, context)
+                        Firestore().deleteEntry(entry, context)
                         navController.popBackStack()
                     },
                     modifier = Modifier

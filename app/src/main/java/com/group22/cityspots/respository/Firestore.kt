@@ -233,6 +233,22 @@ class Firestore {
         }
     }
 
+    suspend fun getEntryByEntryId(entryId: String): Entry? = withContext(Dispatchers.IO) {
+        try {
+            println("Entry Id $entryId")
+            val documentSnapshot = entriesCollectionRef.document(entryId).get().await()
+
+            val entry = documentSnapshot.toObject(Entry::class.java)
+            println("Entry Data $entry")
+            return@withContext entry
+
+        } catch (e: Exception) {
+            println("Error fetching entry $e")
+            null
+        }
+    }
+
+
     suspend fun getTripsByUserId(userId: String): List<Trip> = withContext(Dispatchers.IO) {
         try {
             println("User Id $userId")
