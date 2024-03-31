@@ -12,15 +12,49 @@ import kotlinx.coroutines.launch
 class UserViewModel(private val defaultUser: User) : ViewModel() {
     private val firestore = Firestore()
     val userLiveData = MutableLiveData<User>()
+    val citiesLiveData = MutableLiveData<List<String>>()
+    val lastSelectedCity = MutableLiveData<String>()
 
     init {
         userLiveData.value = defaultUser
+        getUserCities()
     }
 
     fun saveUser(user: User, context: Context) {
         userLiveData.value = user
         viewModelScope.launch {
             firestore.saveUser(user, context)
+        }
+    }
+
+    private fun getUserCities() {
+        val currentUser = userLiveData.value!!
+
+        viewModelScope.launch {
+            currentUser.cities = firestore.getCitiesByUserId(userId = userLiveData.value?.userId!!).toMutableList()
+            citiesLiveData.postValue(currentUser.cities)
+        }
+    }
+
+    fun addUserCity(city: String, context: Context) {
+        userLiveData.value!!.cities.add(city)
+
+        viewModelScope.launch {
+            firestore.updateUser(userLiveData.value!!, context)
+            citiesLiveData.postValue(userLiveData.value!!.cities)
+        }
+    }
+
+    fun updateLastSelectedCity(city: String) {
+        lastSelectedCity.postValue(city)
+    }
+
+    fun removeUserCity(city: String, context: Context) {
+        userLiveData.value!!.cities.remove(city)
+
+        viewModelScope.launch {
+            firestore.updateUser(userLiveData.value!!, context)
+            citiesLiveData.postValue(userLiveData.value!!.cities)
         }
     }
 }

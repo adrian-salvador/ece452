@@ -121,7 +121,7 @@ class MainActivity : ComponentActivity() {
                                     ).show()
                                     navController.navigate("home")
                                 } else if (state.signInError != null) {
-                                    showDialog = true;
+                                    showDialog = true
                                 }
                             }
                             LoginScreen(
@@ -130,7 +130,7 @@ class MainActivity : ComponentActivity() {
                                     lifecycleScope.launch {
                                         val signInIntent = googleAuthUIClient.signIn()
                                         if (signInIntent == null){
-                                            showDialog = true;
+                                            showDialog = true
                                         }
                                         launcher.launch(
                                             IntentSenderRequest.Builder(
@@ -167,7 +167,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
-                        composable("home") { HomeScreen(navController, userViewModel) }
+                        composable("home") { HomeScreen(navController, userViewModel, mapViewModel) }
                         composable("ranking") { RankingScreen(navController, userViewModel) }
                         composable(
                             route = "entry/{entryId}",
@@ -175,7 +175,16 @@ class MainActivity : ComponentActivity() {
                         ) { backStackEntry ->
                             EntryScreen(navController, backStackEntry, userViewModel)
                         }
-                        composable("addEntry") { AddEntryScreen(navController, userViewModel, mapViewModel) }
+                        composable(
+                            route = "addEntry/{entryId}",
+                            arguments = listOf(navArgument("entryId") { type = NavType.StringType; defaultValue = "" })
+                        ) { backStackEntry ->
+                            AddEntryScreen(navController, backStackEntry, userViewModel, mapViewModel)
+                        }
+                        composable("addEntry")
+                        {backStackEntry ->
+                            AddEntryScreen(navController, backStackEntry, userViewModel, mapViewModel)
+                        }
                         composable("friends") { FriendsScreen(navController, userViewModel) }
                         composable(
                             route = "friendsRanking/{userId}/{userName}",
