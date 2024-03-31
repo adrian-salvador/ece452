@@ -10,9 +10,9 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.PlaceTypes
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
-import com.google.android.libraries.places.api.model.PlaceTypes
 import com.google.android.libraries.places.api.net.PlacesClient
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -102,9 +102,8 @@ class MapViewModel(context: Context) : ViewModel() {
                 it.printStackTrace()
             }
     }
-
-    fun updateLocation(newPlace: String, newAddress: String){
-        currentPlaceId = newPlace
+    fun updateLocation(newPlaceId: String, newAddress: String, newPlace: String){
+        currentPlaceId = newPlaceId
         currentAddress = newAddress
     }
 }

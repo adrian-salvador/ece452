@@ -92,7 +92,6 @@ fun AddEntryScreen(
     var hasTitle by remember { mutableStateOf(false) }
     var description by remember { mutableStateOf("") }
     var tripId by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("")}
     val tripViewModel: TripViewModel = viewModel(
         factory = TripViewModelFactory(user!!.userId)
     )
@@ -120,9 +119,7 @@ fun AddEntryScreen(
     var displayMap by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    println("entires size: "+ entries?.size)
     if (entries != null && editEntry == null){
-        println("Entry id: " + entryId)
         if (entryId != null) {
             val origEntry = addEntryViewModel.updateEditEntry(entryId)
             if (origEntry != null) {
@@ -132,8 +129,7 @@ fun AddEntryScreen(
                 addEntryViewModel.updateRating(origEntry.rating)
                 tripId = origEntry.tripId
                 addEntryViewModel.updateTags(origEntry.tags)
-                mapViewModel.updateLocation(origEntry.placeId, origEntry.address)
-                address = origEntry.address
+                mapViewModel.updateLocation(origEntry.placeId, origEntry.address, origEntry.place)
             }
         }
     }
@@ -271,6 +267,7 @@ fun AddEntryScreen(
                             tripId = tripId,
                             placeId = mapViewModel.currentPlaceId,
                             address = mapViewModel.currentAddress,
+                            place = mapViewModel.currentPlace,
                             latitude = mapViewModel.currentLatLong.latitude,
                             longitude = mapViewModel.currentLatLong.longitude,
                             rating = rating.toDouble(),
