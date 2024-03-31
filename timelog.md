@@ -40,3 +40,4 @@
 | 2024/03/30 |        |         | 7      |          |       |       | Redo all dropdown UI and fix scaling and interpolation on ranking selection popup                         |
 | 2024/03/30 |        |         |        |    10    |       |       | Add backend functionality for friend page with firebase, including sending and recieving requests + UI    |
 | 2024/03/31 |        |         |        |    8     |       |       | Improve realtime update of friend page, add viewing friend's rankings and entries + improve UI            |
+| 2024/03/31 |        |         |        |          | 5     |       | Add feature for entry deletion / Bug fix for ranking / PR Review for HomeScreen update                    |
