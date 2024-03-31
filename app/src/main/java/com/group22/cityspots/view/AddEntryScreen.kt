@@ -1,4 +1,4 @@
- package com.group22.cityspots.view
+package com.group22.cityspots.view
 
 import android.net.Uri
 import android.util.Log
@@ -67,6 +67,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -83,22 +84,39 @@ import com.group22.cityspots.viewmodel.TripViewModelFactory
 import okhttp3.internal.wait
 
 
- @Composable
-fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, mapViewModel: MapViewModel) {
+@Composable
+fun AddEntryScreen(
+    navController: NavController,
+    navBackStackEntry: NavBackStackEntry,
+    userViewModel: UserViewModel,
+    mapViewModel: MapViewModel
+) {
     val user by userViewModel.userLiveData.observeAsState()
+
     var entryName by remember { mutableStateOf("") }
     var hasTitle by remember { mutableStateOf(false) }
     var description by remember { mutableStateOf("") }
     var tripId by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("")}
     val tripViewModel: TripViewModel = viewModel(
         factory = TripViewModelFactory(user!!.userId)
     )
     val trips by tripViewModel.tripsLiveData.observeAsState()
+    val entryId = navBackStackEntry.arguments?.getString("entryId")
     val addEntryViewModel: AddEntryViewModel = viewModel(
         factory = AddEntryViewModelFactory(user!!.userId)
     )
-    val tags = addEntryViewModel.tags.observeAsState(listOf())
+
+    val editEntry by addEntryViewModel.editEntry.observeAsState()
+    val entries by addEntryViewModel.entriesLiveData.observeAsState()
+    val currentEntry = entries?.find { entry -> entry.entryId == entryId }
+    var tags = addEntryViewModel.tags.observeAsState(listOf())
+//    if (entryId!=null){
+//        val rating by addEntryViewModel.ratingLiveData.observeAsState(currentEntry!!.rating)
+//    } else {
+//    }
     val rating by addEntryViewModel.ratingLiveData.observeAsState(0.00)
+    //var ranking = 0.00 // baseline
     var showRatingPopup by remember { mutableStateOf(false) }
     var showAddTrip by remember { mutableStateOf(false) }
     val showAddTripCallback: () -> Unit = { showAddTrip = true }
@@ -109,17 +127,41 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
             uri?.let { imageUris.add(it) }
         }
     )
+
     fun refreshTrips() {
-        tripViewModel.refreshTrips() // This function should refresh the tripsLiveData in your ViewModel
+        tripViewModel.refreshTrips()
     }
 
     var displayMap by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    println("entires size: "+ entries?.size)
+    if (entries != null && editEntry == null){
+        println("Entry id: " + entryId)
+        if (entryId != null) {
+            // this means we are in an edit
+            //addEntryViewModel.updateEditEntry(entryId) CHECK IF NEEDED
+            entryName = currentEntry!!.title
+            hasTitle = true
+            description = currentEntry.review
+            //rating = currentEntry.rating
+            //println("Current Entry Rating: " + currentEntry.rating)
+            tripId = currentEntry.tripId
+            //tags = currentEntry.tags
+            //placeId = currentEntry.currentPlaceId
+            address = currentEntry.address
 
-    Box(modifier = Modifier
-        .background(Color(0x2F84ABE4))
-        .padding(10.dp)
+
+            //pictures = null,
+            //tags = tags.value,
+        }
+    }
+
+
+    Box(
+        modifier = Modifier
+            .background(Color(0x2F84ABE4))
+            .padding(10.dp)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -200,20 +242,36 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
             ) {
                 Button(onClick = {
                     if (hasTitle) {
-                        val entryDetails = Entry(
-                            entryId = null,
-                            title = entryName,
-                            pictures = null,
-                            review = description,
-                            tags = tags.value,
-                            tripId = tripId,
-                            placeId = mapViewModel.currentPlaceId,
-                            address = mapViewModel.currentAddress,
-                            rating = rating.toDouble(),
-                            userId = user!!.userId
-                        )
-                        addEntryViewModel.uploadImagesAndCreateEntry(imageUris, entryDetails, context )
-
+                        if (entryId != null) {
+                            val entryDetails = Entry(
+                                entryId = entryId,
+                                title = entryName,
+                                pictures = null,
+                                review = description,
+                                tags = tags.value,
+                                tripId = tripId,
+                                placeId = mapViewModel.currentPlaceId,
+                                address = mapViewModel.currentAddress,
+                                rating = rating.toDouble(),
+                                userId = user!!.userId
+                            )
+                            addEntryViewModel.updateEditEntry(entryId, entryDetails)
+                        }
+                        else {
+                            val entryDetails = Entry(
+                                entryId = null,
+                                title = entryName,
+                                pictures = null,
+                                review = description,
+                                tags = tags.value,
+                                tripId = tripId,
+                                placeId = mapViewModel.currentPlaceId,
+                                address = mapViewModel.currentAddress,
+                                rating = rating.toDouble(),
+                                userId = user!!.userId
+                            )
+                            addEntryViewModel.uploadImagesAndCreateEntry(imageUris, entryDetails, context )
+                        }
                         navController.popBackStack()
                     }else {
                         Toast.makeText(context, "Please add an Activity Name", Toast.LENGTH_LONG).show()
@@ -333,11 +391,12 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
  @Composable
  fun TripEntry(trips: List<Trip>, tripId: String, userId: String, showAddTripCallback: () -> Unit, onValueChange: (String) -> Unit) {
      var expanded by remember { mutableStateOf(false) }
-     var selectedTrip by remember { mutableStateOf("") }
+     var selectedTrip by remember { mutableStateOf(tripId) }
      var triggerRowWidth by remember { mutableIntStateOf(0) }
      trips.forEach { trip ->
          if (trip.tripId == tripId) {
              selectedTrip = trip.title
+             println("Selected Trip Is : " + selectedTrip)
              return@forEach
          }
      }
@@ -416,7 +475,7 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
                          onDismissRequest = { expanded = false },
                          modifier = Modifier
                              .background(Color.White)
-                             .width(with(LocalDensity.current) { triggerRowWidth.toDp() - 36.dp})
+                             .width(with(LocalDensity.current) { triggerRowWidth.toDp() - 36.dp })
                      ) {
                          trips.forEach { trip ->
                              DropdownMenuItem(

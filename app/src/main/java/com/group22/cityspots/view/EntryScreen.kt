@@ -1,6 +1,7 @@
 package com.group22.cityspots.view
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +16,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,10 +40,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import coil.compose.AsyncImage
+import com.group22.cityspots.model.Entry
 import com.group22.cityspots.viewmodel.EntryViewModel
 import com.group22.cityspots.viewmodel.EntryViewModelFactory
 import com.group22.cityspots.viewmodel.TripViewModel
@@ -108,29 +118,32 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                     Row {
                         Box {
                             Text(
-                                modifier = Modifier.padding(start = 20.dp),
+                                modifier = Modifier
+                                    .padding(start = 20.dp)
+                                    .width(240.dp),
                                 style = MaterialTheme.typography.titleLarge,
                                 text = currentEntry.title
                             )
                         }
 
-                        Spacer(Modifier.weight(1f))
+                        Spacer(Modifier.width(20.dp))
 
-                        Box(
-                            Modifier
-                                .size(55.dp)
-                                .clip(CircleShape)
-                                .background(Color.Blue)
-                                .padding(12.dp)
-                                .aspectRatio(1f)
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .widthIn(max = 100.dp)
                         ) {
-                            Text(
-                                text = String.format("%.2f", currentEntry.rating),
-                                color = Color.White,
-                                modifier = Modifier
-                                    .align(Alignment.Center)
+                            Icon(
+                                Icons.Filled.Star,
+                                contentDescription = "No image available",
+                                modifier = Modifier.size(15.dp),
+                                tint = Color(0xfff8d675)
                             )
+                            Text(String.format("%.2f", currentEntry.rating), style = MaterialTheme.typography.bodyMedium)
+
                         }
+
                         Spacer(Modifier.padding(end = 20.dp))
                     }
 
@@ -187,6 +200,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                                 .clip(RoundedCornerShape(10))
                                 .background(Color.LightGray)
                                 .padding(20.dp)
+                                .width(310.dp)
                         ) {
                             Text(text = currentEntry.review)
                         }
@@ -212,7 +226,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                         for (tag in currentEntry.tags) {
                             Box(
                                 Modifier
-                                    .clip(RoundedCornerShape(10))
+                                    .clip(RoundedCornerShape(40.dp))
                                     .background(Color.LightGray)
                                     .padding(14.dp)
                             ) {
@@ -221,6 +235,25 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                                 )
                             }
                             Spacer(Modifier.padding(end = 15.dp))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    //Entry Button
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 30.dp)
+                    ) {
+                        println("Current Entry 1: " + currentEntry.entryId)
+                        println("Current Entry 2: " + entryId)
+
+                        Button(onClick = {
+                            navController?.navigate("addEntry/${currentEntry.entryId}")
+                        }) {
+                            Text("Edit Entry")
                         }
                     }
                 }
