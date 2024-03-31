@@ -58,20 +58,16 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
 
     val cities by userViewModel.citiesLiveData.observeAsState(mutableListOf())
     var selectedCity by remember { mutableStateOf("") }
-    val prevSelectedCity = rememberUpdatedState(selectedCity)
 
     var addCityModalVisible by remember { mutableStateOf(false)}
 
-    val rankingScreenViewModel: EntryViewModel = viewModel(
+    val entryScreenViewModel: EntryViewModel = viewModel(
         factory = EntryViewModelFactory(user!!)
     )
 
     // entries within the same city
-    val entries by rankingScreenViewModel.cityEntriesLiveData.observeAsState()
-
-    if (selectedCity != prevSelectedCity.value) {
-        rankingScreenViewModel.loadCityEntries(selectedCity)
-    }
+    val entries by entryScreenViewModel.cityEntriesLiveData.observeAsState()
+    entryScreenViewModel.loadCityEntries(selectedCity)
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -84,7 +80,7 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
     }
 
     // .split(",").first().trim()
-    selectedCity = if (cities.isEmpty()) "No City Selected" else cities[0]
+    // selectedCity = if (cities.isEmpty()) "No City Selected" else cities[0]
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
