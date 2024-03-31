@@ -102,10 +102,11 @@ class MapViewModel(context: Context) : ViewModel() {
                 it.printStackTrace()
             }
     }
-    fun updateLocation(newPlaceId: String, newAddress: String, newPlace: String){
+    fun updateLocation(newPlaceId: String, newAddress: String, newPlace: String, newLatLong: LatLng){
         currentPlaceId = newPlaceId
         currentAddress = newAddress
         currentPlace = newPlace
+        currentLatLong = newLatLong
     }
 
     fun resetCurrentLocation(){

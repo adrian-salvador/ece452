@@ -69,6 +69,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.google.android.gms.maps.model.LatLng
 import com.group22.cityspots.model.Entry
 import com.group22.cityspots.model.Trip
 import com.group22.cityspots.viewmodel.AddEntryViewModel
@@ -129,7 +130,7 @@ fun AddEntryScreen(
                 addEntryViewModel.updateRating(origEntry.rating)
                 tripId = origEntry.tripId
                 addEntryViewModel.updateTags(origEntry.tags)
-                mapViewModel.updateLocation(origEntry.placeId, origEntry.address, origEntry.place)
+                mapViewModel.updateLocation(origEntry.placeId, origEntry.address, origEntry.place, LatLng(origEntry.latitude, origEntry.longitude))
             }
         }
     }
