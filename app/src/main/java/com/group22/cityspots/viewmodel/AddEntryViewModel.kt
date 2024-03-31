@@ -30,13 +30,20 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
         ratingLiveData.value = newRating
     }
 
-    fun updateEditEntry(entryId: String):Entry {
+    fun updateEditEntry(entryId: String): Entry? {
         val newEditEntry = entriesLiveData.value?.find { entry -> entry.entryId == entryId }
-        print("Updating" + newEditEntry)
-        editEntry.postValue(newEditEntry!!)
-        imageUrls.postValue(newEditEntry.pictures)
+        println("Updating $newEditEntry")
+
+        newEditEntry?.let { entry ->
+            editEntry.value = entry
+            entry.pictures?.let { pics ->
+                imageUrls.value = pics
+            }
+        }
+
         return newEditEntry
     }
+
 
     fun addTag(tag: String) {
         val currentTags = tags.value.orEmpty()

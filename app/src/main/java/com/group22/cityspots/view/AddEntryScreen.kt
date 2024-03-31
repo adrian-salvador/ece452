@@ -134,14 +134,16 @@ fun AddEntryScreen(
         println("Entry id: " + entryId)
         if (entryId != null) {
             val origEntry = addEntryViewModel.updateEditEntry(entryId)
-            entryName = origEntry.title
-            hasTitle = true
-            description = origEntry.review
-            addEntryViewModel.updateRating(origEntry.rating)
-            tripId = origEntry.tripId
-            addEntryViewModel.updateTags(origEntry.tags)
-            mapViewModel.updateLocation(origEntry.placeId, origEntry.address)
-            address = origEntry.address
+            if (origEntry != null) {
+                entryName = origEntry.title
+                hasTitle = true
+                description = origEntry.review
+                addEntryViewModel.updateRating(origEntry.rating)
+                tripId = origEntry.tripId
+                addEntryViewModel.updateTags(origEntry.tags)
+                mapViewModel.updateLocation(origEntry.placeId, origEntry.address)
+                address = origEntry.address
+            }
         }
     }
 
@@ -188,7 +190,7 @@ fun AddEntryScreen(
                 mapViewModel = mapViewModel
             )
 
-            TripEntry(trips ?: emptyList<Trip>(), tripId, user!!.userId, showAddTripCallback) { newTripId ->
+            TripEntry(trips ?: emptyList<Trip>(), tripId, showAddTripCallback) { newTripId ->
                 tripId = newTripId
             }
 
@@ -400,7 +402,7 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
 }
 
  @Composable
- fun TripEntry(trips: List<Trip>, tripId: String, userId: String, showAddTripCallback: () -> Unit, onValueChange: (String) -> Unit) {
+ fun TripEntry(trips: List<Trip>, tripId: String, showAddTripCallback: () -> Unit, onValueChange: (String) -> Unit) {
      var expanded by remember { mutableStateOf(false) }
      var selectedTrip by remember { mutableStateOf(tripId) }
      var triggerRowWidth by remember { mutableIntStateOf(0) }
