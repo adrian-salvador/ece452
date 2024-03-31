@@ -175,7 +175,16 @@ class MainActivity : ComponentActivity() {
                         ) { backStackEntry ->
                             EntryScreen(navController, backStackEntry, userViewModel)
                         }
-                        composable("addEntry") { AddEntryScreen(navController, userViewModel, mapViewModel) }
+                        composable(
+                            route = "addEntry/{entryId}",
+                            arguments = listOf(navArgument("entryId") { type = NavType.StringType; defaultValue = "" })
+                        ) { backStackEntry ->
+                            AddEntryScreen(navController, backStackEntry, userViewModel, mapViewModel)
+                        }
+                        composable("addEntry")
+                        {backStackEntry ->
+                            AddEntryScreen(navController, backStackEntry, userViewModel, mapViewModel)
+                        }
                         composable("friends") { FriendsScreen(navController, userViewModel) }
                         composable("userProfile") {
                             ProfileScreen(

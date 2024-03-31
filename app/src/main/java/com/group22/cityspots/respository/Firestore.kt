@@ -42,9 +42,13 @@ class Firestore {
 
     fun saveEntry(entry: Entry, context: Context) = CoroutineScope(Dispatchers.IO).launch {
         try {
-            val documentReference = entriesCollectionRef.add(entry).await()
-            val entryId = documentReference.id
-            entriesCollectionRef.document(entryId).update("entryId", entryId).await()
+            if (!entry.entryId.isNullOrEmpty()) {
+                entriesCollectionRef.document(entry.entryId).set(entry).await()
+            } else {
+                val documentReference = entriesCollectionRef.add(entry).await()
+                val entryId = documentReference.id
+                entriesCollectionRef.document(entryId).update("entryId", entryId).await()
+            }
 
             withContext(Dispatchers.Main) {
                 Toast.makeText(context, "Successfully Saved Entry", Toast.LENGTH_LONG).show()
@@ -55,6 +59,7 @@ class Firestore {
             }
         }
     }
+
 
     fun deleteEntry(entry: Entry, context: Context) = CoroutineScope(Dispatchers.IO).launch {
         try {
