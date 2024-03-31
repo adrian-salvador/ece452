@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +44,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -78,9 +80,10 @@ import com.group22.cityspots.viewmodel.MapViewModel
 import com.group22.cityspots.viewmodel.UserViewModel
 import com.group22.cityspots.viewmodel.TripViewModel
 import com.group22.cityspots.viewmodel.TripViewModelFactory
+import okhttp3.internal.wait
 
 
-@Composable
+ @Composable
 fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, mapViewModel: MapViewModel) {
     val user by userViewModel.userLiveData.observeAsState()
     var entryName by remember { mutableStateOf("") }
@@ -210,6 +213,7 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
                             userId = user!!.userId
                         )
                         addEntryViewModel.uploadImagesAndCreateEntry(imageUris, entryDetails, context )
+
                         navController.popBackStack()
                     }else {
                         Toast.makeText(context, "Please add an Activity Name", Toast.LENGTH_LONG).show()
@@ -262,7 +266,7 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
     }
 }
 
-@Composable
+ @Composable
 fun CroppedSquareImage(imageUri: Uri) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current).data(data = imageUri)
@@ -394,7 +398,7 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
                      }
                      Button(
                          onClick = { showAddTripCallback() },
-                         shape = RoundedCornerShape(4.dp),
+                         shape = RoundedCornerShape(8.dp),
                          modifier = Modifier
                              .padding(end = 18.dp)
                      ) {
@@ -419,12 +423,15 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
                                  modifier = Modifier
                                      .padding(vertical = 8.dp)
                                      .clip(RoundedCornerShape(8.dp)),
-                                 text = { Text(trip.title) },
+                                 text = { Text(text = trip.title) },
                                  onClick = {
                                      onValueChange(trip.tripId!!)
                                      expanded = false
                                  }
                              )
+                             if (trip != trips.last()) {
+                                 HorizontalDivider(color = Color.LightGray, modifier = Modifier.padding(horizontal = 15.dp))
+                             }
                          }
                      }
                  }

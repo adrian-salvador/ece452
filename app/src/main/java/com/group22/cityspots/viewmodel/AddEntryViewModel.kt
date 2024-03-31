@@ -11,6 +11,7 @@ import com.group22.cityspots.respository.Firestore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import okhttp3.internal.wait
 
 class AddEntryViewModel(private val userId: String) : ViewModel() {
     val ratingLiveData = MutableLiveData<Double>()

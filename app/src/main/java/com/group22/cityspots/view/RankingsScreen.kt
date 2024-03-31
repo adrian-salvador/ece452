@@ -72,15 +72,14 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     contentAlignment = Alignment.CenterStart,
                     modifier = Modifier
                         .height(40.dp)
                         .weight(1f)
-                        .clip(RoundedCornerShape(4.dp))
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White)
                         .clickable(onClick = { expanded = true })
                         .border(
                             width = 1.dp,
@@ -88,16 +87,35 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                             shape = RoundedCornerShape(8.dp)
                         )
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        // Text field to display the selected trip's title
-                        Text(
-                            text = selectedTrip?.title ?: "Select a trip",
-                            modifier = Modifier
-                                .clickable { expanded = true }
-                                .background(Color.White)
-                                .padding(start = 48.dp, end = 136.dp),
-                            color = Color.Black
-                        )
+                    Row {
+                        if (selectedTrip == null){
+                            Text(
+                                text = "Select a trip",
+                                modifier = Modifier
+                                    .clickable { expanded = true }
+                                    .background(Color.White)
+                                    .padding(start = 20.dp),
+                                color = Color.LightGray
+                            )
+                        } else {
+                            Text(
+                                text = selectedTrip!!.title,
+                                modifier = Modifier
+                                    .clickable { expanded = true }
+                                    .background(Color.White)
+                                    .padding(start = 20.dp),
+                                color = Color.Black
+                            )
+                            Spacer(Modifier.weight(1f))
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = "Dropdown",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .align(Alignment.CenterVertically)
+                            )
+                        }
+
 
                         // Dropdown menu
                         DropdownMenu(
@@ -107,7 +125,6 @@ fun RankingScreen(navController: NavController, userViewModel: UserViewModel) {
                         ) {
                             DropdownMenuItem(
                                 modifier = Modifier
-                                    .padding(start = 48.dp, end = 136.dp)
                                     .background(Color.White),
                                 text = { Text("All") },
                                 onClick = {
