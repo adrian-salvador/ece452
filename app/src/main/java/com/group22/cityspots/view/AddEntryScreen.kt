@@ -46,6 +46,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,7 +56,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -117,7 +120,9 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(5.dp),
-            modifier = Modifier.padding(18.dp).verticalScroll(rememberScrollState())
+            modifier = Modifier
+                .padding(18.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -130,7 +135,9 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
 
                 Button(
                     onClick = { showRatingPopup = true },
-                    modifier = Modifier.wrapContentWidth().widthIn(max = 150.dp)
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .widthIn(max = 150.dp)
                 ) {
                     Icon(
                         Icons.Filled.Star,
@@ -197,7 +204,6 @@ fun AddEntryScreen(navController: NavController, userViewModel: UserViewModel, m
                             review = description,
                             tags = tags.value,
                             tripId = tripId,
-                            geoLocation = GeoLocation(0.0, 0.0),
                             placeId = mapViewModel.currentPlaceId,
                             address = mapViewModel.currentAddress,
                             rating = rating.toDouble(),
@@ -324,6 +330,7 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
  fun TripEntry(trips: List<Trip>, tripId: String, userId: String, showAddTripCallback: () -> Unit, onValueChange: (String) -> Unit) {
      var expanded by remember { mutableStateOf(false) }
      var selectedTrip by remember { mutableStateOf("") }
+     var triggerRowWidth by remember { mutableIntStateOf(0) }
      trips.forEach { trip ->
          if (trip.tripId == tripId) {
              selectedTrip = trip.title
@@ -336,76 +343,90 @@ fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
              .fillMaxWidth()
              .padding(top = 15.dp)
              .clip(RoundedCornerShape(15.dp))
-             .background(Color.White) // Set background color to white
+             .background(Color.White)
      ) {
          Column(
              modifier = Modifier
                  .fillMaxWidth()
-                 .padding(vertical = 12.dp)
+                 .padding(vertical = 12.dp),
          ) {
              Text(
                  text = "Trip:",
                  modifier = Modifier.padding(start = 18.dp)
              )
              Spacer(modifier = Modifier.height(8.dp))
-             Row(verticalAlignment = Alignment.CenterVertically) {
-                 Box(
-                     contentAlignment = Alignment.CenterStart,
-                     modifier = Modifier
-                         .weight(1f)
-                         .clip(RoundedCornerShape(4.dp))
-                         .background(Color.White)
-                         .clickable(onClick = { expanded = true })
-                         .padding(horizontal = 18.dp, vertical = 8.dp)
-                         .border(
-                             width = 1.dp,
-                             color = Color.Gray,
-                             shape = RoundedCornerShape(8.dp)
-                         )
-                         .padding(
-                             horizontal = 12.dp,
-                             vertical = 8.dp
-                         )
-                 ) {
-                     Row(verticalAlignment = Alignment.CenterVertically) {
-                         Text(selectedTrip, modifier = Modifier.weight(1f))
+
+                 Row(verticalAlignment = Alignment.CenterVertically) {
+                     Box(
+                         contentAlignment = Alignment.CenterStart,
+                         modifier = Modifier
+                             .onSizeChanged { newSize -> triggerRowWidth = newSize.width }
+                             .weight(1f)
+                             .clip(RoundedCornerShape(4.dp))
+                             .background(Color.White)
+                             .clickable(onClick = { expanded = true })
+                             .padding(horizontal = 18.dp, vertical = 8.dp)
+                             .border(
+                                 width = 1.dp,
+                                 color = Color.Gray,
+                                 shape = RoundedCornerShape(8.dp)
+                             )
+                             .padding(
+                                 horizontal = 12.dp,
+                                 vertical = 8.dp
+                             )
+                     ) {
+                         Row(
+                             verticalAlignment = Alignment.CenterVertically,
+                         ) {
+                             Text(
+                                 selectedTrip,
+                                 modifier = Modifier.weight(1f)
+                             )
+                             Icon(
+                                 imageVector = Icons.Default.ArrowDropDown,
+                                 contentDescription = "Dropdown",
+                                 modifier = Modifier
+                                     .size(24.dp)
+                                     .align(Alignment.CenterVertically)
+                             )
+                         }
+                     }
+                     Button(
+                         onClick = { showAddTripCallback() },
+                         shape = RoundedCornerShape(4.dp),
+                         modifier = Modifier
+                             .padding(end = 18.dp)
+                     ) {
                          Icon(
-                             imageVector = Icons.Default.ArrowDropDown,
-                             contentDescription = "Dropdown",
-                             modifier = Modifier
-                                 .size(24.dp)
-                                 .align(Alignment.CenterVertically)
+                             imageVector = Icons.Filled.Add,
+                             contentDescription = null,
                          )
                      }
                  }
-                 Button(
-                     onClick = { showAddTripCallback() },
-                     shape = RoundedCornerShape(4.dp),
-                     modifier = Modifier
-                         .padding(end = 18.dp)
-                 ) {
-                     Icon(
-                         imageVector = Icons.Filled.Add,
-                         contentDescription = null,
-                     )
-                 }
-             }
-             DropdownMenu(
-                 expanded = expanded,
-                 onDismissRequest = { expanded = false },
-                 modifier = Modifier.fillMaxWidth(),
-             ) {
-                 trips.forEach { trip ->
-                     DropdownMenuItem(
+             Row {
+                 Spacer(modifier = Modifier.width(18.dp))
+                 Box(modifier = Modifier.width(300.dp)){
+                     DropdownMenu(
+                         expanded = expanded,
+                         onDismissRequest = { expanded = false },
                          modifier = Modifier
-                             .padding(start = 48.dp, end = 136.dp)
-                             .background(Color.White),
-                         text = { Text(trip.title) },
-                         onClick = {
-                             onValueChange(trip.tripId!!)
-                             expanded = false
+                             .background(Color.White)
+                             .width(with(LocalDensity.current) { triggerRowWidth.toDp() - 36.dp})
+                     ) {
+                         trips.forEach { trip ->
+                             DropdownMenuItem(
+                                 modifier = Modifier
+                                     .padding(vertical = 8.dp)
+                                     .clip(RoundedCornerShape(8.dp)),
+                                 text = { Text(trip.title) },
+                                 onClick = {
+                                     onValueChange(trip.tripId!!)
+                                     expanded = false
+                                 }
+                             )
                          }
-                     )
+                     }
                  }
              }
          }
