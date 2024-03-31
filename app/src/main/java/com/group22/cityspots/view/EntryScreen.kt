@@ -97,10 +97,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
         }
     }
     val context = LocalContext.current
-    var showReport = false
-    var alertDialog: AlertDialog?=null
-
-
+    var showReport by remember { mutableStateOf(false)}
 
     Scaffold (
         bottomBar = { BottomNavigationBar(navController = navController) }
@@ -349,10 +346,10 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
             }
         }
     }
-    //if (showReport){
+    if (showReport){
         ReportPopup(context)
         showReport = false
-    //}
+    }
 }
 
 @Composable
