@@ -34,6 +34,7 @@ class AddEntryViewModel(private val userId: String) : ViewModel() {
         val newEditEntry = entriesLiveData.value?.find { entry -> entry.entryId == entryId }
         print("Updating" + newEditEntry)
         editEntry.postValue(newEditEntry!!)
+        imageUrls.postValue(newEditEntry.pictures)
         return newEditEntry
     }
 
