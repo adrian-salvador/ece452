@@ -129,6 +129,7 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
         userViewModel.addUserCity(it, currentContext)
         selectedCity = it
         userViewModel.updateLastSelectedCity(it)
+        entryScreenViewModel.loadCityEntries(it)
     }
 
     if (selectedCity == "No City Selected" && cities.isNotEmpty()){
@@ -226,13 +227,18 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                         // Button to delete city
                         Button(
                             onClick = {
-                            userViewModel.removeUserCity(selectedCity, currentContext)
-                            selectedCity = if (cities.isNotEmpty()) cities[0] else "No City Selected"
-                            userViewModel.updateLastSelectedCity(selectedCity)
-                            }
-                        ) {
+                                userViewModel.removeUserCity(selectedCity, currentContext)
+                                if (cities.isNotEmpty()) {
+                                    selectedCity = cities[0]
+                                    userViewModel.updateLastSelectedCity(selectedCity)
+                                } else {
+                                    selectedCity = "No City Selected"
+                                }
+                                entryScreenViewModel.loadCityEntries(selectedCity)
+                            }) {
                             Text("Delete City")
                         }
+
                     }
 
                 }
