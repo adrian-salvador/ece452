@@ -105,5 +105,13 @@ class MapViewModel(context: Context) : ViewModel() {
     fun updateLocation(newPlaceId: String, newAddress: String, newPlace: String){
         currentPlaceId = newPlaceId
         currentAddress = newAddress
+        currentPlace = newPlace
+    }
+
+    fun resetCurrentLocation(){
+        currentLatLong = LatLng(43.4668, -80.51639)
+        currentPlace = "Select Location"
+        currentPlaceId = ""
+        currentAddress = ""
     }
 }
