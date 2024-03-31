@@ -168,7 +168,6 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                         }
                         Spacer(Modifier.width(20.dp))
                         Spacer(Modifier.weight(1f))
-
                         RatingBubble(rating = entry.rating)
                     }
 
@@ -245,7 +244,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                     ){
                         Text(
                             style = MaterialTheme.typography.titleMedium,
-                            text = "Other Reviews"
+                            text = "Other Location Reviews"
                         )
                         Spacer(Modifier.weight(1f))
                         RatingBubble(if (duplicateEntries?.isNotEmpty() == true) {
