@@ -365,14 +365,15 @@ fun LocationNameEntry(entryName: String, hasTitle: Boolean, modifier: Modifier, 
 
 @Composable
 fun DescriptionEntry(description: String, onValueChange: (String) -> Unit) {
+    var descriptionvalue by remember { mutableStateOf(description) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 15.dp, bottom = 12.dp)
     ) {
         TextField(
-            value = description,
-            onValueChange = onValueChange,
+            value = descriptionvalue,
+            onValueChange = { descriptionvalue = it },
             placeholder = { Text("Description") },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.White,
