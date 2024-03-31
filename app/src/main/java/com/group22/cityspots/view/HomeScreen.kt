@@ -228,12 +228,12 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                         Button(
                             onClick = {
                                 userViewModel.removeUserCity(selectedCity, currentContext)
-                                if (cities.isNotEmpty()) {
-                                    selectedCity = cities[0]
-                                    userViewModel.updateLastSelectedCity(selectedCity)
+                                selectedCity = if (cities.isNotEmpty()) {
+                                    cities[0]
                                 } else {
-                                    selectedCity = "No City Selected"
+                                    "No City Selected"
                                 }
+                                userViewModel.updateLastSelectedCity(selectedCity)
                                 entryScreenViewModel.loadCityEntries(selectedCity)
                             }) {
                             Text("Delete City")
