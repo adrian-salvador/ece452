@@ -3,6 +3,7 @@ package com.group22.cityspots.view
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,14 +13,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -38,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -150,14 +151,19 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                 .padding(16.dp)
                 .align(Alignment.TopStart)) {
                 // Check if user data is available and display the welcome message
-//                user?.let {
-//                    Text(
-//                        text = "Welcome ${it.name}!",
-//                        style = MaterialTheme.typography.titleLarge
-//                    )
-//                }
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                Column {
+                    user?.let {
+                        Text(text = "Welcome")
+                        Text(
+                            text = "${it.username}!",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Row (verticalAlignment = Alignment.CenterVertically) {
                     Box {
@@ -165,6 +171,14 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.clickable { expanded = !expanded }
                         ) {
+                            Icon(
+                                Icons.Default.LocationOn,
+                                contentDescription = "location",
+                                modifier = Modifier.size(30.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
                             Text(
                                 text = (
                                     if (selectedCity == "No City Selected") "No City Selected"
@@ -243,20 +257,19 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
 
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 
-                Text(text = "Places in ${selectedCity.split(",").first().trim()}")
+                Text(
+                    text = "Recommended in ${selectedCity.split(",").first().trim()}",
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Box(
-                    modifier = Modifier.fillMaxSize()
                 ) {
-                    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-                    Column(
+                    Row(
                         modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .verticalScroll(state = rememberScrollState(), enabled = true)
+                            .horizontalScroll(state = rememberScrollState(), enabled = true)
                             .align(Alignment.Center)
                             .fillMaxWidth()
                     ) {
@@ -266,10 +279,10 @@ fun HomeScreen(navController: NavController, userViewModel: UserViewModel, mapVi
                                     navController = navController,
                                     entry = entry,
                                     index = null,
-                                    height = screenWidth - 60.dp,
-                                    modifier = Modifier.width(screenWidth - 50.dp)
+                                    height = 275.dp,
+                                    modifier = Modifier.width(200.dp)
                                 )
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.width(16.dp))
                             }
                         }
                     }
