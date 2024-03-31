@@ -303,7 +303,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                 }
 
                 if (showMap) {
-                    MapScreen(mapViewModel, LatLng(currentEntry.latitude, currentEntry.longitude)) {
+                    MapScreen(mapViewModel, LatLng(currentEntry?.latitude!!, currentEntry?.longitude!!)) {
                         showMap = false
                     }
                 }
