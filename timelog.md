@@ -43,3 +43,4 @@
 | 2024/03/31 |        |         |        |          | 5     |       | Add feature for entry deletion / Bug fix for ranking / PR Review for HomeScreen update                    |
 | 2024/03/31 |        |         |        |          | 4     |       | map refinements                                                                                           |
 | 2024/03/31 |        |         | 10     |          |       |       | Redesign view entry, add aggregated view entries, fix friend requests                                     |
+| 2024/03/31 |        |         | 1      |          |       |       | Write and record presentation script                                                                      |
