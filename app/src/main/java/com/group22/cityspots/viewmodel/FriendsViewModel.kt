@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 class FriendsViewModel(private val userEmail: String) : ViewModel() {
     private var originalFriends = listOf<User>()
     private val _friendsLiveData = MutableLiveData<List<User>>()
-    private val _originalFriendUser =  MutableLiveData<Friends>()
-    val friendUser = _originalFriendUser
+    private val _friendClassLiveData =  MutableLiveData<Friends>()
+    val friendUser = _friendClassLiveData
     val friendsLiveData: LiveData<List<User>> = _friendsLiveData
 
     init {
@@ -26,7 +26,7 @@ class FriendsViewModel(private val userEmail: String) : ViewModel() {
         viewModelScope.launch {
             val user = Firestore().getFriendByUserId(userEmail)
             println("User $user")
-            _originalFriendUser.value = user!!
+            _friendClassLiveData.value = user!!
             val friends = Firestore().getFriendsByUserIds(user.friendIDs!!)
             originalFriends = friends
             _friendsLiveData.postValue(originalFriends)
@@ -34,28 +34,47 @@ class FriendsViewModel(private val userEmail: String) : ViewModel() {
     }
 
     fun addFriend(email: String, user: User, context: Context) {
-        friendUser.value!!.sentRequests!!.add(email)
+        // Safely add to sentRequests and update LiveData
+        _friendClassLiveData.value?.let { friend ->
+            if (friend.sentRequests == null) {
+                friend.sentRequests = mutableListOf()
+            }
+            friend.sentRequests?.add(email)
+            _friendClassLiveData.postValue(friend) // Post the entire updated object
+        }
+
         viewModelScope.launch {
             Firestore().sendFriendReq(email, user, context)
         }
-        friendUser.value = friendUser.value
     }
 
     fun modFriendReq(email: String, user: User, action: String, context: Context) {
-        friendUser.value!!.recvRequests!!.remove(email)
-        friendUser.value = _originalFriendUser.value
-        viewModelScope.launch {
+        // Safely remove from recvRequests and update LiveData
+        _friendClassLiveData.value?.let { friend ->
+            friend.recvRequests?.remove(email)
             if (action == "accept") {
                 Firestore().modFriendReq(email, user, true, context)
-                _originalFriendUser.value!!.friendIDs!!.add(email)
-                val friends = Firestore().getFriendsByUserIds(_originalFriendUser.value!!.friendIDs!!)
-                _friendsLiveData.postValue(friends)
-            }
-            else {
+                if (friend.friendIDs == null) {
+                    friend.friendIDs = mutableListOf()
+                }
+                friend.friendIDs?.add(email)
+                friend.sentRequests?.remove(email)
+                friend.recvRequests?.remove(email)
+
+                // Since getFriendsByUserIds is a suspend function, call it inside a coroutine
+                viewModelScope.launch {
+                    friend.friendIDs?.let { ids ->
+                        val friends = Firestore().getFriendsByUserIds(ids)
+                        _friendsLiveData.postValue(friends) // Post the entire updated list
+                    }
+                }
+            } else {
                 Firestore().modFriendReq(email, user, false, context)
             }
+            _friendClassLiveData.postValue(friend) // Post the entire updated object
         }
     }
+
 }
 
 class FriendsViewModelFactory(private val userEmail: String) : ViewModelProvider.Factory {

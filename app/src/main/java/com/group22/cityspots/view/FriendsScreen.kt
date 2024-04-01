@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,16 +15,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -38,13 +33,13 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -59,8 +54,6 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.group22.cityspots.model.Friends
 import com.group22.cityspots.model.User
-import com.group22.cityspots.ui.theme.Purple40
-import com.group22.cityspots.ui.theme.Purple80
 import com.group22.cityspots.viewmodel.FriendsViewModel
 import com.group22.cityspots.viewmodel.FriendsViewModelFactory
 import com.group22.cityspots.viewmodel.UserViewModel
@@ -139,7 +132,11 @@ fun FriendsScreen(navController: NavController, userViewModel: UserViewModel) {
                         onClick = { showFriends = true },
                         modifier = Modifier
                             .weight(1f)
-                            .border(width = 1.dp, color = Color(0xff435e91), shape = RoundedCornerShape(30.dp))
+                            .border(
+                                width = 1.dp,
+                                color = Color(0xff435e91),
+                                shape = RoundedCornerShape(30.dp)
+                            )
                             .background(color = buttonBGColor, shape = RoundedCornerShape(30.dp)),
                         colors = buttonColour
                     ) {
@@ -155,7 +152,11 @@ fun FriendsScreen(navController: NavController, userViewModel: UserViewModel) {
                         onClick = { showFriends = false },
                         modifier = Modifier
                             .weight(1f)
-                            .border(width = 1.dp, color = Color(0xff435e91), shape = RoundedCornerShape(30.dp))
+                            .border(
+                                width = 1.dp,
+                                color = Color(0xff435e91),
+                                shape = RoundedCornerShape(30.dp)
+                            )
                             .background(color = buttonBGColor2, shape = RoundedCornerShape(30.dp)),
                         colors = buttonColour2
                     ) {
@@ -169,7 +170,9 @@ fun FriendsScreen(navController: NavController, userViewModel: UserViewModel) {
                 }
                 Button(
                     onClick = { showAddFriend = !showAddFriend },
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     colors = ButtonColors(
                         containerColor = Color(0xFF0182da),
                         disabledContainerColor = Color(0xFF0182da),
@@ -192,7 +195,7 @@ fun FriendsScreen(navController: NavController, userViewModel: UserViewModel) {
                 if (showFriends) {
                     RenderFriends(friends, navController)
                 } else{
-                    RenderRequests(user!!, friendUser!!, friendsViewModel)
+                    RenderRequests(user!!, friendsViewModel)
                 }
             }
 
@@ -317,10 +320,11 @@ fun RenderFriends(friends: List<User>?, navController: NavController) {
 }
 
 @Composable
-fun RenderRequests(user: User, friendUser: Friends, friendsViewModel: FriendsViewModel) {
-
-    val sendReqs = friendUser.sentRequests
-    val recvReqs = friendUser.recvRequests
+fun RenderRequests(user: User, friendsViewModel: FriendsViewModel) {
+    val friendUser by friendsViewModel.friendUser.observeAsState()
+    val sendReqs = friendUser?.sentRequests
+    val recvReqs = friendUser?.recvRequests
+    println(recvReqs)
     val context = LocalContext.current
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -347,20 +351,29 @@ fun RenderRequests(user: User, friendUser: Friends, friendsViewModel: FriendsVie
         )
         Spacer(modifier = Modifier.height(15.dp))
         DrawBorder()
+        val visibilityStates = remember { mutableStateMapOf<String, Boolean>().apply { recvReqs?.forEach { this[it] = true } } }
         recvReqs?.forEach() { req ->
-            Row (
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = req)
-                IconButton(onClick = { friendsViewModel.modFriendReq(req,user, "accept", context) }) {
-                    Icon(Icons.Default.Check, contentDescription = "Accept")
+            if (visibilityStates[req] == true) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = req)
+                    IconButton(onClick = {
+                        friendsViewModel.modFriendReq(req, user, "accept", context)
+                        visibilityStates[req] = false
+                    }) {
+                        Icon(Icons.Default.Check, contentDescription = "Accept")
+                    }
+                    IconButton(onClick = {
+                        friendsViewModel.modFriendReq(req, user, "decline", context)
+                        visibilityStates[req] = false
+                    }) {
+                        Icon(Icons.Rounded.Close, contentDescription = "Decline")
+                    }
                 }
-                IconButton(onClick = { friendsViewModel.modFriendReq(req,user, "decline", context) }) {
-                    Icon(Icons.Rounded.Close, contentDescription = "Decline")
-                }
+                DrawBorder()
             }
-            DrawBorder()
         }
     }
 }
