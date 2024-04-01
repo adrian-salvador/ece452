@@ -43,6 +43,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -140,237 +141,255 @@ fun AddEntryScreen(
         }
     }
 
-
-    Box(
-        modifier = Modifier
-            .background(Color(0x2F84ABE4))
-            .padding(10.dp)
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(5.dp),
+    Scaffold(
+        bottomBar = {
+            if (!displayMap) {
+                BottomNavigationBar(navController = navController)
+            }
+        }
+    ) { innerPadding ->
+        Box(
             modifier = Modifier
-                .padding(18.dp)
-                .verticalScroll(rememberScrollState())
+                .background(Color(0x2F84ABE4))
+                .padding(innerPadding)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                LocationNameEntry(entryName, hasTitle, Modifier.weight(1F)) { name, hasName ->
-                    entryName = name
-                    hasTitle = hasName
-                }
-
-                Button(
-                    onClick = { showRatingPopup = true },
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .widthIn(max = 150.dp)
-                ) {
-                    Icon(
-                        Icons.Filled.Star,
-                        contentDescription = "No image available",
-                        modifier = Modifier.size(20.dp),
-                        tint = Color(0xfff8d675)
-                    )
-                    Text(String.format("%.2f", rating), style = MaterialTheme.typography.bodyLarge)
-
-                }
-            }
-
-            DisplayLocation(
-                onClick = {displayMap = !displayMap},
-                mapViewModel = mapViewModel
-            )
-
-            TripEntry(trips ?: emptyList<Trip>(), tripId, showAddTripCallback) { newTripId ->
-                tripId = newTripId
-            }
-
-            DescriptionEntry(description) { newDescription ->
-                description = newDescription
-            }
-
-            TagEditorFragment(
-                tags = tags,
-                addTag = { tag -> addEntryViewModel.addTag(tag) },
-                removeTag = { tag -> addEntryViewModel.removeTag(tag) }
-            )
-
-            // Display Selected Images
-            Row(
+            Column(
+                verticalArrangement = Arrangement.spacedBy(5.dp),
                 modifier = Modifier
-                    .horizontalScroll(rememberScrollState())
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    .padding(18.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                imageUrls?.forEach { imageUrl ->
-                    Box(
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    LocationNameEntry(entryName, hasTitle, Modifier.weight(1F)) { name, hasName ->
+                        entryName = name
+                        hasTitle = hasName
+                    }
+
+                    Button(
+                        onClick = { showRatingPopup = true },
                         modifier = Modifier
-                            .height(100.dp)
-                            .width(80.dp)
-                    ){
-                        CroppedSquareImage(imageUrl)
+                            .wrapContentWidth()
+                            .widthIn(max = 150.dp)
+                    ) {
+                        Icon(
+                            Icons.Filled.Star,
+                            contentDescription = "No image available",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color(0xfff8d675)
+                        )
+                        Text(
+                            String.format("%.2f", rating),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+
+                    }
+                }
+
+                DisplayLocation(
+                    onClick = { displayMap = !displayMap },
+                    mapViewModel = mapViewModel
+                )
+
+                TripEntry(trips ?: emptyList<Trip>(), tripId, showAddTripCallback) { newTripId ->
+                    tripId = newTripId
+                }
+
+                DescriptionEntry(description) { newDescription ->
+                    description = newDescription
+                }
+
+                TagEditorFragment(
+                    tags = tags,
+                    addTag = { tag -> addEntryViewModel.addTag(tag) },
+                    removeTag = { tag -> addEntryViewModel.removeTag(tag) }
+                )
+
+                // Display Selected Images
+                Row(
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    imageUrls?.forEach { imageUrl ->
                         Box(
                             modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .size(24.dp)
-                                .background(
-                                    color = Color.White,
-                                    shape = CircleShape
-                                )
-                                .padding(4.dp)
+                                .height(100.dp)
+                                .width(80.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Delete",
+                            CroppedSquareImage(imageUrl)
+                            Box(
                                 modifier = Modifier
-                                    .align(Alignment.Center)
-                                    .size(20.dp)
-                                    .clickable {
-                                        addEntryViewModel.deleteImage(
-                                            imageUrl,
-                                            context
-                                        )
-                                    }
+                                    .align(Alignment.TopEnd)
+                                    .size(24.dp)
+                                    .background(
+                                        color = Color.White,
+                                        shape = CircleShape
+                                    )
                                     .padding(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Delete",
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .size(20.dp)
+                                        .clickable {
+                                            addEntryViewModel.deleteImage(
+                                                imageUrl,
+                                                context
+                                            )
+                                        }
+                                        .padding(4.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                val imagePickerLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.GetContent()
+                ) { uri: Uri? ->
+                    uri?.let {
+                        addEntryViewModel.uploadImage(
+                            context,
+                            it,
+                            "userId"
+                        ) // Use the actual userId
+                    }
+                }
+
+                //Upload Image Button
+                Button(
+                    onClick = { imagePickerLauncher.launch("image/*") },
+                    modifier = Modifier.padding(top = 10.dp)
+                ) {
+                    Text("Upload Images")
+                }
+
+                //Submit Button
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 30.dp)
+                ) {
+                    Button(
+                        modifier = Modifier.align(Alignment.Center),
+                        onClick = {
+                            if (hasTitle) {
+                                println(entryId)
+                                val entryDetails = Entry(
+                                    entryId = entryId,
+                                    title = entryName,
+                                    pictures = null,
+                                    review = description,
+                                    tags = tags.value,
+                                    tripId = tripId,
+                                    placeId = mapViewModel.currentPlaceId,
+                                    address = mapViewModel.currentAddress,
+                                    place = mapViewModel.currentPlace,
+                                    latitude = mapViewModel.currentLatLong.latitude,
+                                    longitude = mapViewModel.currentLatLong.longitude,
+                                    rating = rating.toDouble(),
+                                    userId = user!!.userId
+                                )
+
+                                addEntryViewModel.createEntry(entryDetails, context)
+                                navController.popBackStack()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Please add an Activity Name",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }) {
+                        if (entryId == null) {
+                            Text("Add Entry")
+                        } else {
+                            Text("Update Entry")
+                        }
+
+                    }
+
+                    if (entryId != null) {
+                        Button(
+                            onClick = { showDialog = true },
+                            modifier = Modifier.align(Alignment.CenterEnd)
+                        ) {
+                            Icon(Icons.Filled.Delete, contentDescription = "Delete Button")
+                        }
+
+                        if (showDialog) {
+                            AlertDialog(
+                                onDismissRequest = { showDialog = false },
+                                title = { Text("Delete Entry") },
+                                text = { Text("Are you sure you want to delete this entry?") },
+                                confirmButton = {
+                                    Button(
+                                        onClick = {
+                                            Firestore().deleteEntry(entryId, context)
+                                            navController.popBackStack()
+                                            showDialog = false
+                                        }
+                                    ) {
+                                        Text("Yes")
+                                    }
+                                },
+                                dismissButton = {
+                                    Button(onClick = { showDialog = false }) {
+                                        Text("No")
+                                    }
+                                }
                             )
                         }
                     }
                 }
             }
+        }
 
-            val imagePickerLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.GetContent()
-            ) { uri: Uri? ->
-                uri?.let {
-                    addEntryViewModel.uploadImage(context, it, "userId") // Use the actual userId
-                }
-            }
-
-            //Upload Image Button
-            Button(
-                onClick = { imagePickerLauncher.launch("image/*") },
-                modifier = Modifier.padding(top = 10.dp)
-            ) {
-                Text("Upload Images")
-            }
-
-            //Submit Button
+        if (showRatingPopup) {
             Box(
-                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 30.dp)
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable(onClick = { showRatingPopup = false }),
+                contentAlignment = Alignment.Center
             ) {
-                Button(
-                    modifier = Modifier.align(Alignment.Center),
-                    onClick = {
-                    if (hasTitle) {
-                        println(entryId)
-                        val entryDetails = Entry(
-                            entryId = entryId,
-                            title = entryName,
-                            pictures = null,
-                            review = description,
-                            tags = tags.value,
-                            tripId = tripId,
-                            placeId = mapViewModel.currentPlaceId,
-                            address = mapViewModel.currentAddress,
-                            place = mapViewModel.currentPlace,
-                            latitude = mapViewModel.currentLatLong.latitude,
-                            longitude = mapViewModel.currentLatLong.longitude,
-                            rating = rating.toDouble(),
-                            userId = user!!.userId
-                        )
-
-                        addEntryViewModel.createEntry( entryDetails, context )
-                        navController.popBackStack()
-                    }else {
-                        Toast.makeText(context, "Please add an Activity Name", Toast.LENGTH_LONG).show()
-                    }
-                }) {
-                    if (entryId == null){
-                        Text("Add Entry")
-                    } else {
-                        Text("Update Entry")
-                    }
-
-                }
-
-                if ( entryId != null ){
-                    Button(
-                        onClick = { showDialog = true },
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    ) {
-                        Icon(Icons.Filled.Delete, contentDescription = "Delete Button")
-                    }
-
-                    if (showDialog) {
-                        AlertDialog(
-                            onDismissRequest = { showDialog = false },
-                            title = { Text("Delete Entry") },
-                            text = { Text("Are you sure you want to delete this entry?") },
-                            confirmButton = {
-                                Button(
-                                    onClick = {
-                                        Firestore().deleteEntry(entryId, context)
-                                        navController.popBackStack()
-                                        showDialog = false
-                                    }
-                                ) {
-                                    Text("Yes")
-                                }
-                            },
-                            dismissButton = {
-                                Button(onClick = { showDialog = false }) {
-                                    Text("No")
-                                }
-                            }
-                        )
-                    }
+                RatingSelectionPopup(addEntryViewModel) {
+                    showRatingPopup = false
                 }
             }
         }
-    }
 
-    if (showRatingPopup) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-                .clickable(onClick = { showRatingPopup = false }),
-            contentAlignment = Alignment.Center
-        ) {
-            RatingSelectionPopup(addEntryViewModel) {
-                showRatingPopup = false
+        if (showAddTrip) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable(onClick = { showAddTrip = false }),
+                contentAlignment = Alignment.Center
+            ) {
+                AddTripPopup(user!!.userId) {
+                    showAddTrip = false
+                    refreshTrips()
+                }
             }
         }
-    }
 
-    if (showAddTrip) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-                .clickable(onClick = { showAddTrip = false }),
-            contentAlignment = Alignment.Center
-        ) {
-            AddTripPopup(user!!.userId) {
-                showAddTrip = false
-                refreshTrips()
+        if (displayMap) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                MapScreen(
+                    close = { displayMap = false },
+                    viewModel = mapViewModel
+                )
             }
-        }
-    }
-
-    if (displayMap) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            MapScreen(
-                close = {displayMap = false},
-                viewModel = mapViewModel
-            )
         }
     }
 }

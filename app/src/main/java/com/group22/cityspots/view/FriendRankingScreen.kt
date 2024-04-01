@@ -11,11 +11,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -73,56 +79,63 @@ fun FriendRankingScreen(
             )
             Spacer(modifier = Modifier.height(20.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    contentAlignment = Alignment.CenterStart,
+            Box(modifier = Modifier
+                .fillMaxWidth()
+            ) {
+                Row(
                     modifier = Modifier
-                        .height(40.dp)
-                        .weight(1f)
-                        .clip(RoundedCornerShape(4.dp))
-                        .clickable(onClick = { expanded = true })
-                        .border(
-                            width = 1.dp,
-                            color = Color.Gray,
-                            shape = RoundedCornerShape(8.dp)
-                        )
+                        .clickable { expanded = true }
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(Color(0xFFF3F8FE))
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        // Text field to display the selected trip's title
-                        Text(
-                            text = selectedTrip?.title ?: "Select a trip",
-                            modifier = Modifier
-                                .clickable { expanded = true }
-                                .background(Color.White)
-                                .padding(start = 48.dp, end = 136.dp),
-                            color = Color.Black
-                        )
+                    Text(
+                        text = selectedTrip?.title ?: "Select a trip",
+                        modifier = Modifier
+                            .padding(start = 15.dp),
+                        color = if (selectedTrip == null) Color.LightGray else Color.Black
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Dropdown",
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                }
 
-                        // Dropdown menu
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            DropdownMenuItem(
-                                modifier = Modifier
-                                    .padding(start = 48.dp, end = 136.dp)
-                                    .background(Color.White),
-                                text = { Text("All") },
-                                onClick = {
-                                    rankingScreenViewModel.setSelectedTrip(null)
-                                    expanded = false
-                                }
-                            )
-                            trips.forEach { trip ->
-                                DropdownMenuItem(
-                                    text = { Text(trip.title) },
-                                    onClick = {
-                                        rankingScreenViewModel.setSelectedTrip(trip)
-                                        expanded = false
-                                    }
-                                )
-                            }
+                // Dropdown menu
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .background(Color(0xFFF3F8FE))
+                        .width(350.dp)
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            rankingScreenViewModel.setSelectedTrip(null)
+                            expanded = false
+                        },
+                        text = { Text("None") }
+                    )
+
+                    if (trips.isNotEmpty()){
+                        HorizontalDivider(color = Color.LightGray, modifier = Modifier.padding(horizontal = 15.dp))
+                    }
+
+                    trips.forEachIndexed { index, trip ->
+                        DropdownMenuItem(
+                            onClick = {
+                                rankingScreenViewModel.setSelectedTrip(trip)
+                                expanded = false
+                            },
+                            text = { Text(trip.title) }
+                        )
+                        if (index < trips.size - 1) {
+                            HorizontalDivider(color = Color.LightGray, modifier = Modifier.padding(horizontal = 15.dp))
                         }
                     }
                 }
@@ -135,7 +148,7 @@ fun FriendRankingScreen(
                 removeTag = { tag -> rankingScreenViewModel.removeTag(tag) }
             )
             Spacer(modifier = Modifier.height(10.dp))
-            val chunkedEntries = entries?.chunked(2) ?: listOf()
+            val chunkedEntries =entries?.sortedByDescending{ it.rating }?.chunked(2) ?: listOf()
             chunkedEntries.forEachIndexed { rowIndex, rowEntries ->
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(20.dp),

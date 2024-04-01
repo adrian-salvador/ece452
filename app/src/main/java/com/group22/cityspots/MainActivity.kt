@@ -203,7 +203,7 @@ class MainActivity : ComponentActivity() {
                                 navArgument("userName") { type = NavType.StringType }
                             )
                         ) { backStackEntry ->
-                            FriendEntryScreen(navController, backStackEntry)
+                            FriendEntryScreen(navController, backStackEntry, mapViewModel)
                         }
                         composable("userProfile") {
                             ProfileScreen(
