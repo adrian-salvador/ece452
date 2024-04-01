@@ -45,9 +45,11 @@
 | 2024/03/29 |        |         |        |          | 2     |       | deliverbale 5                                                                                             |
 | 2024/03/29 |        |         |        |          | 3     |       | helped with home page city filter integration                                                             | 
 | 2024/03/29 |        |         |        |          |       | 5     | Add new trips                                                                                             |
-| 2024/03/29 |        |         |        |          |       |       | Filter entries based on trips                                                                             |
+| 2024/03/29 |        |         |        |          |       | 5     | Filter entries based on trips                                                                             |
 | 2024/03/29 |        |         |        |    3     |       |       | Add friend page with minor UI                                                                             |
-| 2024/03/30 |   3    |         |        |          |       |       | update homescreen to use live data of current city entries                                                |                     
+| 2024/03/30 |   3    |         |        |          |       |       | update homescreen to use live data of current city entries                                                |         
+| 2024/03/31 |        |         |        |          |       | 3     | worked on the final presentation demo                                                |      
+| 2024/03/31 |        |         |        |          |       | 4     | worked on the architecture and design document                                               |      
 | 2024/03/30 |   2    |         |        |          |       |       | add logic to aggregate entires of the same places + related bugfixing                                     |                     
 | 2024/03/30 |        |         | 7      |          |       |       | Redo all dropdown UI and fix scaling and interpolation on ranking selection popup                         |
 | 2024/03/30 |        |         |        |    10    |       |       | Add backend functionality for friend page with firebase, including sending and recieving requests + UI    |
