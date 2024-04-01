@@ -68,6 +68,7 @@ import androidx.compose.material3.AlertDialog
 import io.grpc.Context
 import android.app.AlertDialog
 import androidx.compose.material.icons.filled.AddAlert
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import android.content.Context as CTX
@@ -96,6 +97,12 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
     var showMap by remember { mutableStateOf(false) }
     var showReport by remember { mutableStateOf(false)}
     val context = LocalContext.current
+
+    var showEdit = false
+    if (user?.userId == currentEntry?.userId) {
+        showEdit = true
+    }
+
     Scaffold (
         bottomBar = {
             if (!showMap) {
@@ -170,6 +177,13 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                             Text(
                                 style = MaterialTheme.typography.titleLarge,
                                 text = entry.title
+                            )
+                        }
+                        Spacer(Modifier.width(10.dp))
+                        if (((duplicateEntries?.size ?: 0) > 3) && (currentEntry?.address?.isNotEmpty() == true)) {
+                            Icon(
+                                Icons.Filled.Groups,
+                                contentDescription = "Overcrowded"
                             )
                         }
                         Spacer(Modifier.width(20.dp))
@@ -326,38 +340,42 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                             }
                         }
                     }
-                    Row(
-                        modifier = Modifier.padding(horizontal = 20.dp),
-                        verticalAlignment =  Alignment.CenterVertically
-                    ){
-                        Button(
-                            onClick = {
-                                showReport = true
-                            },
-                            modifier = Modifier
-                                .width(100.dp)
+                    if (!showEdit) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                            verticalAlignment =  Alignment.CenterVertically
                         ){
-                            Icon(
-                                Icons.Filled.AddAlert,
-                                contentDescription = "Report"
-                            )
+                            Button(
+                                onClick = {
+                                    showReport = true
+                                },
+                                modifier = Modifier
+                                    .width(100.dp)
+                            ){
+                                Icon(
+                                    Icons.Filled.AddAlert,
+                                    contentDescription = "Report"
+                                )
+                            }
                         }
                     }
                 }
-                Button(
-                    onClick = {
-                        navController.navigate("addEntry/${entry.entryId}")
-                    },
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp),
-                ){
-                    Icon(
-                        Icons.Filled.Edit,
-                        contentDescription = "No image available",
-                        modifier = Modifier.size(25.dp),
-                        tint = Color.White
-                    )
+                if (showEdit) {
+                    Button(
+                        onClick = {
+                            navController.navigate("addEntry/${entry.entryId}")
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp),
+                    ) {
+                        Icon(
+                            Icons.Filled.Edit,
+                            contentDescription = "No image available",
+                            modifier = Modifier.size(25.dp),
+                            tint = Color.White
+                        )
+                    }
                 }
 
                 if (showMap) {
