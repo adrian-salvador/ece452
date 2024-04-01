@@ -97,7 +97,9 @@ fun TagEditorFragment(
             ),
         )
         Spacer(modifier = Modifier.height(10.dp))
-        LazyRow {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             itemsIndexed(recommendedTags.sorted()) { _i, tag ->
                 Tag(tag = tag, isRecommendedTag = true, addTag = addTag, removeRecommendedTag = {
                     recommendedTags.remove(tag)
@@ -132,8 +134,9 @@ fun Tag(
 ) {
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = Color(0xFFDBE8F9),
-        contentColor = Color(0xFF176FF2),
+        // TODO: Reconsider color for the recommended tags
+        color = if (isRecommendedTag) Color.Gray else Color(0xFFDBE8F9),
+        contentColor = if (isRecommendedTag) Color.White else  Color(0xFF176FF2),
         modifier = Modifier.clickable {
             if (isRecommendedTag) {
                 addTag(tag)
