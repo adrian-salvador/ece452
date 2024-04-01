@@ -64,6 +64,13 @@ import com.group22.cityspots.viewmodel.MapViewModel
 import com.group22.cityspots.viewmodel.TripViewModel
 import com.group22.cityspots.viewmodel.TripViewModelFactory
 import com.group22.cityspots.viewmodel.UserViewModel
+import androidx.compose.material3.AlertDialog
+import io.grpc.Context
+import android.app.AlertDialog
+import androidx.compose.material.icons.filled.AddAlert
+import androidx.compose.ui.layout.VerticalAlignmentLine
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import android.content.Context as CTX
 
 
 @Composable
@@ -87,6 +94,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
         }
     }
     var showMap by remember { mutableStateOf(false) }
+    var showReport by remember { mutableStateOf(false)}
     val context = LocalContext.current
     Scaffold (
         bottomBar = {
@@ -288,7 +296,7 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                         Row(
                             modifier = Modifier
                                 .horizontalScroll(rememberScrollState())
-                                .padding(vertical = 10.dp,horizontal = 20.dp),
+                                .padding(vertical = 10.dp, horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ){
                             otherEntry.pictures?.forEach { imageUrl ->
@@ -318,6 +326,23 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                             }
                         }
                     }
+                    Row(
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                        verticalAlignment =  Alignment.CenterVertically
+                    ){
+                        Button(
+                            onClick = {
+                                showReport = true
+                            },
+                            modifier = Modifier
+                                .width(100.dp)
+                        ){
+                            Icon(
+                                Icons.Filled.AddAlert,
+                                contentDescription = "Report"
+                            )
+                        }
+                    }
                 }
                 Button(
                     onClick = {
@@ -342,6 +367,10 @@ fun EntryScreen(navController: NavController, navBackStackEntry: NavBackStackEnt
                 }
             }
         }
+    }
+    if (showReport){
+        ReportPopup(context)
+        showReport = false
     }
 }
 
@@ -393,4 +422,22 @@ fun RatingBubbleSmall(rating: Double) {
             modifier = Modifier.padding(start = 4.dp)
         )
     }
+}
+
+@Composable
+fun ReportPopup(context: CTX) {
+    val builder = AlertDialog.Builder(context)
+    builder.setTitle("Report")
+    builder.setMessage("Would you like to report this post or user?")
+
+    builder.setPositiveButton("User") { dialog, which ->
+        dialog.dismiss()
+    }
+
+    builder.setNegativeButton("Post") { dialog, which ->
+        dialog.dismiss()
+    }
+
+    val dialog: AlertDialog = builder.create()
+    dialog.show()
 }
