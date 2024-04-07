@@ -72,3 +72,4 @@
 | 2024/03/31 |        | 3       |        |          |       |       | script for demo video                                                                                                                 |      
 | 2024/03/31 |        | 3       |        |          |       |       | screen recording & slides for demo video                                                                                              |      
 | 2024/04/01 |        | 2       |        |          |       |       | editing demo video and upload to youtube                                                                                              |      
+| 2924/04/05 |        |         |        |          | 4     |       | deliverable 6
