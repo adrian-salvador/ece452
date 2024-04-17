@@ -75,4 +75,4 @@
 | 2024/04/05 |        |         |        |          | 4     |       | deliverable 6                                                                                                                         |
 | 2024/04/06 |        |         |        |    3     |       |       | deliverable 7                                                                                                                         | 
 | 2024/04/06 |        |   2     |        |          |       |       | deliverable 7                                                                                                                         |
-| 2024/04/06 |        |    2    |        |          |       |       | deliverable 7                                                                                                                         | 
+| 2024/04/07 |        |    2    |        |          |       |       | deliverable 7                                                                                                                         | 
